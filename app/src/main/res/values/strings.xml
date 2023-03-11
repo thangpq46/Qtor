@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">QTor</string>
+    <string name="title_activity_editor">EditorActivity</string>
+    <string name="title_editor">Editor</string>
+</resources>
