@@ -1,6 +1,7 @@
 package com.example.qtor.util
 
 import android.graphics.PointF
+import android.graphics.Rect
 import android.graphics.RectF
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
@@ -40,3 +41,5 @@ fun getAngle(pointBefore: PointF, pointAfter: PointF, rotationPoint: PointF): Do
         )
     )
 }
+
+fun Rect.offset(): Offset = Offset(this.left.toFloat(), this.top.toFloat())

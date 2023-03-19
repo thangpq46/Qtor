@@ -6,7 +6,9 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import java.io.File
 import kotlin.math.sqrt
 
@@ -69,4 +71,8 @@ fun RectF.scale(factor: Float) {
     right = rectCenterX + newWidth / 2F
     top = rectCenterY - newHeight / 2F
     bottom = rectCenterY + newHeight / 2F
+}
+
+fun Int.toDp(context: Context):Dp{
+    return (this/context.resources.displayMetrics.density).dp
 }
