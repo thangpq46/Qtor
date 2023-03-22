@@ -1,8 +1,6 @@
 package com.example.qtor.ui.editor
 
 import android.content.Context
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
@@ -11,16 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -32,7 +27,6 @@ import androidx.compose.ui.unit.toSize
 import androidx.core.graphics.drawable.toBitmap
 import com.example.qtor.R
 import com.example.qtor.constant.*
-import com.example.qtor.data.model.AITarget
 import com.example.qtor.util.*
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -43,7 +37,8 @@ fun EditorView(
     viewModel: EditorViewModel
 ) {
 //    viewModel.initStickerS()
-    val imagePreview by viewModel.bitmap.collectAsState()
+    val imageBitmaps = viewModel.imageBitmaps
+    val currentBitmapIndex by viewModel.currentBitmapIndex.collectAsState()
     val viewWidth by viewModel.editorWidth.collectAsState()
     val viewHeight by viewModel.editorHeight.collectAsState()
     var downX by remember {
@@ -276,7 +271,7 @@ fun EditorView(
         .scale(scaleF)
         .drawBehind {
             drawImage(
-                imagePreview,
+                imageBitmaps[currentBitmapIndex],
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(viewWidth, viewHeight)
             )
@@ -286,10 +281,14 @@ fun EditorView(
                 MAIN_TOOl_REMOVE_OBJECT -> {
                     processActionToolRemove(event)
                 }
-                MAIN_TOOL_STICKERS->{
+
+                MAIN_TOOL_STICKERS -> {
                     processActionToolStickers(event)
                 }
-                else->{true}
+
+                else -> {
+                    true
+                }
             }
         }) {
 //        drawRect(Color.Green)
@@ -345,9 +344,9 @@ fun EditorView(
             MAIN_TOOl_REMOVE_OBJECT->{
                 actions.lastOrNull()?.let {
                     for (obj in it.aiObjects) {
-                        if (obj.isSelected) {
-                            drawImage(obj.mask, topLeft = obj.box.offset(), alpha = DRAW_ALPHA)
-                        }
+                        drawRect(Color.Green,obj.box.offset(),obj.box.Size(), style = Stroke(
+                            width = 5f
+                        ))
                     }
                 }
                 path?.let { drawPath(it, Color.White , style = Stroke(

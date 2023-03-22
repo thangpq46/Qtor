@@ -32,13 +32,12 @@ import kotlinx.coroutines.launch
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
     private val repository = ImageRepository()
-    private val _bitmap = MutableStateFlow(ImageBitmap(10, 10, ImageBitmapConfig.Alpha8))
-    val bitmap: StateFlow<ImageBitmap> get() = _bitmap
+    private val _imageBitmaps = mutableStateListOf<ImageBitmap>()
+    val imageBitmaps: List<ImageBitmap> = _imageBitmaps
     private val _stickers = mutableStateListOf<Sticker>()
     val stickers: List<Sticker> = _stickers
     private val deviceWidth = application.resources.displayMetrics.widthPixels
     private val deviceHeight = application.resources.displayMetrics.heightPixels
-
     private val _rectDelete = MutableStateFlow(RectF(ZERO, ZERO, ZERO, ZERO))
     val rectDelete: StateFlow<RectF> get() = _rectDelete
 
@@ -51,13 +50,18 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _rectScale = MutableStateFlow(RectF(ZERO, ZERO, ZERO, ZERO))
     val rectScale: StateFlow<RectF> get() = _rectScale
 
+
+    private val _currentBitmapIndex = MutableStateFlow(0)
+    val currentBitmapIndex: StateFlow<Int> = _currentBitmapIndex
     internal fun initBitmaps(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            _bitmap.value =
+            _imageBitmaps.add(
                 BitmapFactory.decodeStream(
                     getApplication<Application>().contentResolver.openInputStream(uri)
                 ).asImageBitmap()
-            initRectDraw()
+            )
+            _currentBitmapIndex.value = _imageBitmaps.lastIndex
+            initEditorSize()
         }
     }
 
@@ -165,19 +169,22 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
     }
 
-    private fun initRectDraw() {
-        val bitmapWidth = _bitmap.value.width
-        val bitmapHeight = _bitmap.value.height
-        val scale: Float = if (bitmapHeight > bitmapWidth) {
-            kotlin.math.min(
-                deviceWidth.toFloat() / bitmapWidth,
-                deviceHeight.toFloat() / bitmapHeight
-            )
-        } else {
-            deviceWidth.toFloat() / bitmapWidth.toFloat()
+    private fun initEditorSize() {
+        _imageBitmaps.getOrNull(_currentBitmapIndex.value)?.let { bitmap ->
+            val bitmapWidth = bitmap.width
+            val bitmapHeight = bitmap.height
+            val scale: Float = if (bitmapHeight > bitmapWidth) {
+                kotlin.math.min(
+                    deviceWidth.toFloat() / bitmapWidth,
+                    deviceHeight.toFloat() / bitmapHeight
+                )
+            } else {
+                deviceWidth.toFloat() / bitmapWidth.toFloat()
+            }
+            _editorWidth.value = (bitmapWidth * scale).toInt()
+            _editorHeight.value = (bitmapHeight * scale).toInt()
         }
-        _editorWidth.value = (bitmapWidth * scale).toInt()
-        _editorHeight.value = (bitmapHeight * scale).toInt()
+
     }
 
     private val matrixScale = Matrix()
@@ -247,78 +254,81 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     //
     internal fun initDetectObjTool() {
         _aiObjects.clear()
-        val scaledBitmap = _bitmap.value.asAndroidBitmap().let {
-            Bitmap.createScaledBitmap(
+        _imageBitmaps.getOrNull(_currentBitmapIndex.value)?.asAndroidBitmap()?.let {
+            val scaledBitmap = Bitmap.createScaledBitmap(
                 it,
                 editorWidth.value,
                 editorHeight.value, true
             )
-        }
-        val image = InputImage.fromBitmap(scaledBitmap, 0)
-        segmenter.process(image).addOnSuccessListener { results ->
-            val mask = results.buffer
-            val maskWidth = results.width
-            val maskHeight = results.height
-            val colors = IntArray(maskWidth * maskHeight)
-            for (i in 0 until maskWidth * maskHeight) {
-                val backgroundLikelihood = 1 - mask.float
-                if (backgroundLikelihood > 0.9) {
-                } else if (backgroundLikelihood > 0.2) {
-                    colors[i] = android.graphics.Color.WHITE
-                } else {
-                    colors[i] = android.graphics.Color.WHITE
-                }
-            }
-            val maskAI = Bitmap.createBitmap(
-                colors, maskWidth, maskHeight, Bitmap.Config.ARGB_8888
-            )
-            objectDetector.process(image).addOnSuccessListener { detectedObjects ->
-                for (obj in detectedObjects) {
-                    val maskPeopleObj = Bitmap.createBitmap(
-                        maskAI,
-                        obj.boundingBox.left,
-                        obj.boundingBox.top,
-                        obj.boundingBox.width(),
-                        obj.boundingBox.height()
-                    )
-
-                    val maskOthersObj = Bitmap.createBitmap(
-                        obj.boundingBox.width(), obj.boundingBox.height(), Bitmap.Config.ARGB_8888
-                    )
-                    val canvas = android.graphics.Canvas(maskOthersObj)
-                    canvas.drawColor(android.graphics.Color.WHITE)
-                    val origin = Bitmap.createBitmap(
-                        scaledBitmap,
-                        obj.boundingBox.left,
-                        obj.boundingBox.top,
-                        obj.boundingBox.width(),
-                        obj.boundingBox.height()
-                    )
-                    if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
-                        _aiObjects.add(
-                            AITarget(
-                                obj.boundingBox,
-                                maskPeopleObj.asImageBitmap(),
-                                origin.asImageBitmap(),
-                                TYPE_PEOPLE
-                            )
-                        )
+            val image = InputImage.fromBitmap(scaledBitmap, 0)
+            segmenter.process(image).addOnSuccessListener { results ->
+                val mask = results.buffer
+                val maskWidth = results.width
+                val maskHeight = results.height
+                val colors = IntArray(maskWidth * maskHeight)
+                for (i in 0 until maskWidth * maskHeight) {
+                    val backgroundLikelihood = 1 - mask.float
+                    if (backgroundLikelihood > 0.9) {
+                    } else if (backgroundLikelihood > 0.2) {
+                        colors[i] = android.graphics.Color.WHITE
                     } else {
-                        _aiObjects.add(
-                            AITarget(
-                                obj.boundingBox,
-                                maskOthersObj.asImageBitmap(),
-                                origin.asImageBitmap(),
-                                TYPE_OTHERS
-                            )
-                        )
+                        colors[i] = android.graphics.Color.WHITE
                     }
+                }
+                val maskAI = Bitmap.createBitmap(
+                    colors, maskWidth, maskHeight, Bitmap.Config.ARGB_8888
+                )
+                objectDetector.process(image).addOnSuccessListener { detectedObjects ->
+                    for (obj in detectedObjects) {
+                        val maskPeopleObj = Bitmap.createBitmap(
+                            maskAI,
+                            obj.boundingBox.left,
+                            obj.boundingBox.top,
+                            obj.boundingBox.width(),
+                            obj.boundingBox.height()
+                        )
+
+                        val maskOthersObj = Bitmap.createBitmap(
+                            obj.boundingBox.width(),
+                            obj.boundingBox.height(),
+                            Bitmap.Config.ARGB_8888
+                        )
+                        val canvas = android.graphics.Canvas(maskOthersObj)
+                        canvas.drawColor(android.graphics.Color.WHITE)
+                        val origin = Bitmap.createBitmap(
+                            scaledBitmap,
+                            obj.boundingBox.left,
+                            obj.boundingBox.top,
+                            obj.boundingBox.width(),
+                            obj.boundingBox.height()
+                        )
+                        if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
+                            _aiObjects.add(
+                                AITarget(
+                                    obj.boundingBox,
+                                    maskPeopleObj.asImageBitmap(),
+                                    origin.asImageBitmap(),
+                                    TYPE_PEOPLE
+                                )
+                            )
+                        } else {
+                            _aiObjects.add(
+                                AITarget(
+                                    obj.boundingBox,
+                                    maskOthersObj.asImageBitmap(),
+                                    origin.asImageBitmap(),
+                                    TYPE_OTHERS
+                                )
+                            )
+                        }
+                    }
+                    _removeObjectActions.add(RemoveObjectAction(_aiObjects))
+                }.addOnFailureListener { e ->
+                    e.printStackTrace()
                 }
             }.addOnFailureListener { e ->
                 e.printStackTrace()
             }
-        }.addOnFailureListener { e ->
-            e.printStackTrace()
         }
     }
 
@@ -328,62 +338,70 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         addRemoveObjectAction()
     }
 
-    private val dptoPx= application.resources.displayMetrics.density
+    private val dptoPx = application.resources.displayMetrics.density
     private fun getMaskBitmap(path: Path?): Bitmap {
         val result =
             Bitmap.createBitmap(_editorWidth.value, _editorHeight.value, Bitmap.Config.ARGB_8888)
                 .asImageBitmap()
         val canvas = Canvas(result)
-        canvas.drawRect(Rect(0f,0f,result.width.toFloat(),result.height.toFloat()), Paint().apply {
-            color= Color.Black
-            style= PaintingStyle.Fill
-        })
+        canvas.drawRect(
+            Rect(0f, 0f, result.width.toFloat(), result.height.toFloat()),
+            Paint().apply {
+                color = Color.Black
+                style = PaintingStyle.Fill
+            })
         val paint = Paint().apply {
             style = PaintingStyle.Stroke
             color = Color.White
-            strokeWidth=20*dptoPx
+            strokeWidth = 20 * dptoPx
         }
         path?.let {
-            canvas.drawPath(path,paint)
+            canvas.drawPath(path, paint)
         }
         _removeObjectActions.toMutableList().lastOrNull()?.let {
             it.aiObjects.forEach { aiTarget ->
-                if (aiTarget.isSelected){
-                    canvas.drawImage(aiTarget.mask,aiTarget.box.offset(), Paint())
+                if (aiTarget.isSelected) {
+                    canvas.drawImage(aiTarget.mask, aiTarget.box.offset(), Paint())
                 }
             }
         }
         val bmp = result.asAndroidBitmap()
-        val scale =Bitmap.createScaledBitmap(
+        val scale = Bitmap.createScaledBitmap(
             bmp,
-            _bitmap.value.width,
-            _bitmap.value.height,
+            _imageBitmaps[_currentBitmapIndex.value].width,
+            _imageBitmaps[_currentBitmapIndex.value].height,
             true
         )
         bmp.recycle()
         return scale
     }
-    private val _stateScreen= MutableStateFlow(INDILE)
-    val stateScreen :StateFlow<Boolean>  = _stateScreen
-    fun removeObject(path: Path?=null,obj:AITarget?=null) {
+
+    private val _stateScreen = MutableStateFlow(INDILE)
+    val stateScreen: StateFlow<Boolean> = _stateScreen
+    fun removeObject(path: Path? = null, obj: AITarget? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            _stateScreen.value= LOADING
-            repository.cleanupBitmap(_bitmap.value.asAndroidBitmap(),getMaskBitmap(path),object :DataSource.EraserObjectCallback{
+            _stateScreen.value = LOADING
+            val image = _imageBitmaps.get(_currentBitmapIndex.value).asAndroidBitmap()
+            val mask = getMaskBitmap(path)
+            repository.cleanupBitmap(image, mask, object : DataSource.EraserObjectCallback {
                 override fun onLocalComplete(result: ImageBitmap) {
-                    _bitmap.value=result
+                    if (_currentBitmapIndex.value<_imageBitmaps.lastIndex){
+                        _imageBitmaps.removeRange(_currentBitmapIndex.value+1, _imageBitmaps.lastIndex)
+                    }
+                    _imageBitmaps.add(_currentBitmapIndex.value+1, result)
                     _removeObjectActions.clear()
                     obj?.let {
                         _aiObjects.remove(obj)
                     }
-                    _stateScreen.value= INDILE
+                    _stateScreen.value = INDILE
                 }
 
                 override fun onCloudComplete(result: ImageBitmap) {
-                    _stateScreen.value= INDILE
+                    _stateScreen.value = INDILE
                 }
 
                 override fun onFailed(error: String) {
-                    _stateScreen.value= INDILE
+                    _stateScreen.value = INDILE
                 }
 
             })
@@ -394,4 +412,16 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     val editorWidth: StateFlow<Int> = _editorWidth
     private val _editorHeight = MutableStateFlow(0)
     val editorHeight: StateFlow<Int> = _editorHeight
+
+    internal fun undo() {
+        if (currentBitmapIndex.value >= 1) {
+            _currentBitmapIndex.value -= 1
+        }
+    }
+
+    internal fun redo() {
+        if (currentBitmapIndex.value < _imageBitmaps.lastIndex) {
+            _currentBitmapIndex.value += 1
+        }
+    }
 }

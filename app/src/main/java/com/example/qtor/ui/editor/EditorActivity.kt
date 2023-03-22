@@ -27,34 +27,7 @@ class EditorActivity : ComponentActivity() {
         }
         setContent {
             QTorTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    val state by viewModel.stateScreen.collectAsState()
-                    Column(
-                        Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Toolbar(Modifier.weight(1f), title = getString(R.string.title_editor))
-                        if (state== LOADING){
-                            ProgressBar()
-                        }
-                        EditorView(
-                            this@EditorActivity,
-                            Modifier
-                                .fillMaxSize()
-                                .weight(7f), viewModel = viewModel
-                        )
-
-                        BottomNavigationTool(
-                            Modifier
-                                .background(MaterialTheme.colors.onSurface)
-                                .weight(2f), viewModel = viewModel
-                        )
-                    }
-                }
+                EditorTheme(viewModel = viewModel, context = this)
             }
         }
     }
