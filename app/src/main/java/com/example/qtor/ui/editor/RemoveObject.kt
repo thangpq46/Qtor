@@ -12,9 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.qtor.constant.DETECT_OBJECT_MODE
-import com.example.qtor.constant.EDIT_IMAGE_TOOl
-import com.example.qtor.constant.LIST_OF_TOOLS
+import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
 
@@ -25,8 +23,10 @@ fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewMod
     Column {
         when (tool) {
             EDIT_IMAGE_TOOl -> {
-                viewModel.initDetectObjTool()
                 RemoveObjectTool(viewModel = viewModel)
+            }
+            STICKER_TOOL->{
+                StickersTool(viewModel = viewModel)
             }
         }
         LazyRow(
@@ -55,13 +55,15 @@ private fun prepareBottomMenu(): List<BottomMenuItem> {
 fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) {
     val bottomMenuItemsList = prepareBottomMenu()
     val itemActive by viewModel.removeObjectToolActive.collectAsState()
-    val AIObjects =viewModel.aiObjects
+    val bitmapIndex by viewModel.currentBitmapIndex.collectAsState()
+    val AIObjects =viewModel.imageBitmaps[bitmapIndex].AIObj
     Column {
         when (itemActive) {
             DETECT_OBJECT_MODE -> {
                 AITool(objects = AIObjects, onClick = {index,item->
-                    viewModel.selectAIObject(index,item)
-                    viewModel.removeObject(obj =  item)
+                    viewModel.removeObject(obj =  item){
+                        //TODO
+                    }
                 })}
         }
         BottomNavigation(

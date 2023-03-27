@@ -51,34 +51,34 @@ class RemoteDataSource:DataSource {
         mask: Bitmap,
         callback: DataSource.EraserObjectCallback
     ) {
-            val imageByteArray = ByteArrayOutputStream()
-            image.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
-            val maskByteArray = ByteArrayOutputStream()
-            mask.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
-            val requestBody =
-                MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
-                    IMAGE_FILE, FILE_NAME, RequestBody.create(
-                        MediaType.parse(MEDIA_PARSE_TYPE), imageByteArray.toByteArray()
-                    )
-                ).addFormDataPart(
-                    MASK_FILE, FILE_NAME_MASK, RequestBody.create(
-                        MediaType.parse(MEDIA_PARSE_TYPE), maskByteArray.toByteArray()
-                    )
-                ).build()
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .header(HEADER_AUTH_KEY, "Firebase.remoteConfig.getString(CONFIG_API_KEY)")
-            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody).build()
-        try {
-            val response = client.newCall(request).execute()
-             if (response.isSuccessful && response.body() != null) {
-                callback.onCloudComplete(BitmapFactory.decodeStream(response.body().byteStream()).asImageBitmap())
-            } else {
-                callback.onFailed("no internet")
-            }
-        } catch (e: IOException) {
-            callback.onFailed("no internet")
-        }
+//            val imageByteArray = ByteArrayOutputStream()
+//            image.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
+//            val maskByteArray = ByteArrayOutputStream()
+//            mask.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
+//            val requestBody =
+//                MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
+//                    IMAGE_FILE, FILE_NAME, RequestBody.create(
+//                        MediaType.parse(MEDIA_PARSE_TYPE), imageByteArray.toByteArray()
+//                    )
+//                ).addFormDataPart(
+//                    MASK_FILE, FILE_NAME_MASK, RequestBody.create(
+//                        MediaType.parse(MEDIA_PARSE_TYPE), maskByteArray.toByteArray()
+//                    )
+//                ).build()
+//        val client = OkHttpClient()
+//        val request = Request.Builder()
+//            .header(HEADER_AUTH_KEY, "Firebase.remoteConfig.getString(CONFIG_API_KEY)")
+//            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody).build()
+//        try {
+//            val response = client.newCall(request).execute()
+//             if (response.isSuccessful && response.body() != null) {
+//                callback.onCloudComplete(BitmapFactory.decodeStream(response.body().byteStream()).asImageBitmap())
+//            } else {
+//                callback.onFailed("no internet")
+//            }
+//        } catch (e: IOException) {
+//            callback.onFailed("no internet")
+//        }
 
     }
 

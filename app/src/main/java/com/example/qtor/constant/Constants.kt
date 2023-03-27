@@ -45,3 +45,5 @@ const val IN_PAINTING_RADIUS = 5.0
 const val DRAW_ALPHA = 0.6f
 const val LOADING = false
 const val INDILE = true
+const val STORAGE_FILTERS = "filters"
+const val ASSET_PATH = "file:///android_asset/"

@@ -82,7 +82,6 @@ fun EditorView(
     val rectCopy by viewModel.rectCopy.collectAsState()
     val rectFlip by viewModel.rectFlip.collectAsState()
     val rectScale by viewModel.rectScale.collectAsState()
-    val actions = viewModel.removeObjectActions
     //
     var path by remember {
         mutableStateOf<Path?>(Path())
@@ -94,6 +93,7 @@ fun EditorView(
     var drawY by remember {
         mutableStateOf(0f)
     }
+
     fun moveImage() {
 
     }
@@ -119,19 +119,22 @@ fun EditorView(
                             downY = event.y
                             path?.lineTo(downX, downY)
                             val temp = path
-                            path=null
-                            path=temp
+                            path = null
+                            path = temp
                         } else if (event.pointerCount == 2) {
                             moveImage()
                         }
                         true
                     }
                     MotionEvent.ACTION_UP -> {
-                        viewModel.removeObject(path)
-                        path = Path()
+                        viewModel.removeObject(path){
+                            path = Path()
+                        }
                         true
                     }
-                    else -> {true}
+                    else -> {
+                        true
+                    }
                 }
             }
             LASSO_MODE -> {
@@ -146,7 +149,7 @@ fun EditorView(
     fun processActionToolStickers(event: MotionEvent): Boolean {
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                if (event.pointerCount == 2) { 
+                if (event.pointerCount == 2) {
                 } else if (event.pointerCount == 1) {
                     downX = event.x
                     downY = event.y
@@ -221,7 +224,7 @@ fun EditorView(
                 }
                 true
             }
-            MotionEvent.ACTION_MOVE->{
+            MotionEvent.ACTION_MOVE -> {
                 if (event.pointerCount == 1) {
                     if (itemActive != -1) {
                         if (scaling) {
@@ -250,7 +253,7 @@ fun EditorView(
         }
     }
 
-    fun processScaleAndMoveView(event: MotionEvent):Boolean{
+    fun processScaleAndMoveView(event: MotionEvent): Boolean {
         drawX += (event.getX(0) - downX) / d.density
         drawY += (event.getY(0) - downY) / d.density
         currentDistance = getDistance(event)
@@ -271,7 +274,7 @@ fun EditorView(
         .scale(scaleF)
         .drawBehind {
             drawImage(
-                imageBitmaps[currentBitmapIndex],
+                imageBitmaps[currentBitmapIndex].image,
                 dstOffset = IntOffset.Zero,
                 dstSize = IntSize(viewWidth, viewHeight)
             )
@@ -291,8 +294,7 @@ fun EditorView(
                 }
             }
         }) {
-//        drawRect(Color.Green)
-        if (mainToolActive!= MAIN_TOOl_REMOVE_OBJECT){
+        if (mainToolActive != MAIN_TOOl_REMOVE_OBJECT) {
             for (i in stickers.indices) {
                 rotate(
                     stickers[i].angle,
@@ -340,20 +342,28 @@ fun EditorView(
                 }
             }
         }
-        when(mainToolActive){
-            MAIN_TOOl_REMOVE_OBJECT->{
-                actions.lastOrNull()?.let {
-                    for (obj in it.aiObjects) {
-                        drawRect(Color.Green,obj.box.offset(),obj.box.Size(), style = Stroke(
-                            width = 5f
-                        ))
+        when (mainToolActive) {
+            MAIN_TOOl_REMOVE_OBJECT -> {
+                when(removeObjectToolActive){
+                    DETECT_OBJECT_MODE->{
+                        for (obj in imageBitmaps[currentBitmapIndex].AIObj) {
+                            drawRect(
+                                Color.Green, obj.box.offset(), obj.box.Size(), style = Stroke(
+                                    width = 5f
+                                )
+                            )
+                        }
                     }
                 }
-                path?.let { drawPath(it, Color.White , style = Stroke(
-                    width = 10.dp.toPx()
-                ), alpha = .6f) }
+                path?.let {
+                    drawPath(
+                        it, Color.White, style = Stroke(
+                            width = 10.dp.toPx()
+                        ), alpha = .6f
+                    )
+                }
             }
-            else->{
+            else -> {
             }
         }
     }

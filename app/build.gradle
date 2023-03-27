@@ -67,4 +67,5 @@ dependencies {
     implementation 'com.google.mlkit:segmentation-selfie:16.0.0-beta4'
     implementation 'com.google.mlkit:object-detection-custom:17.0.0'
     implementation 'com.quickbirdstudios:opencv-contrib:3.4.15'
+    implementation("io.coil-kt:coil-compose:2.0.0")
 }

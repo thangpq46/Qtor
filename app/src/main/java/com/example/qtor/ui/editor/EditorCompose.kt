@@ -23,6 +23,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
 import com.example.qtor.constant.LOADING
+import com.example.qtor.constant.STORAGE_STICKERS
 
 @Composable
 fun CircleButton(image: ImageVector, onClick: () -> Unit) {
@@ -39,6 +40,7 @@ fun CircleButton(image: ImageVector, onClick: () -> Unit) {
 @Composable
 fun EditorTheme(viewModel: EditorViewModel, context: Context) {
     // A surface container using the 'background' color from the theme
+    viewModel.initAssetData(STORAGE_STICKERS)
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
