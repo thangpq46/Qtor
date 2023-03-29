@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
 
 class ImageRepository(
-    private val remoteDataSource: RemoteDataSource = RemoteDataSource(),
-    private val localDataSource: LocalDataSource = LocalDataSource()
+    private val remoteDataSource: RemoteDataSource ,
+    private val localDataSource: LocalDataSource
 ) : DataSource {
 
     override suspend fun getStickers(
@@ -32,5 +32,14 @@ class ImageRepository(
         callback: DataSource.EraserObjectCallback
     ) {
         localDataSource.cleanupBitmap(image,mask,callback)
+    }
+
+    override suspend fun getSticker(
+        name: String,
+        folderName: String,
+        callBack: DataSource.StickerLoadCallBack
+    ) {
+        localDataSource.getSticker(name,folderName,callBack)
+        remoteDataSource.getSticker(name,folderName,callBack)
     }
 }

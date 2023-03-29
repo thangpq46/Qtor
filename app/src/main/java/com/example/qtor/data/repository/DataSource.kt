@@ -32,4 +32,12 @@ interface DataSource {
         fun onCloudComplete(result: ImageBitmap)
         fun onFailed(error:String)
     }
+
+    suspend fun getSticker(name: String, folderName: String, callBack: StickerLoadCallBack)
+
+    interface StickerLoadCallBack {
+        fun onLocalLoad(bitmap: Bitmap)
+        fun onFireBaseLoad(bitmap: Bitmap)
+        fun onLoadFailed(e: Exception)
+    }
 }

@@ -17,6 +17,8 @@ import com.example.qtor.constant.*
 import com.example.qtor.data.model.*
 import com.example.qtor.data.repository.DataSource
 import com.example.qtor.data.repository.ImageRepository
+import com.example.qtor.data.repository.LocalDataSource
+import com.example.qtor.data.repository.RemoteDataSource
 import com.example.qtor.ui.base.BaseViewModel
 import com.example.qtor.util.*
 import com.google.mlkit.common.model.LocalModel
@@ -32,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
-    private val repository = ImageRepository()
+//    private val repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
     private val _imageActions = mutableStateListOf<ImageAction>()
     val imageBitmaps: List<ImageAction> = _imageActions
     private val _stickers = mutableStateListOf<Sticker>()
@@ -454,6 +456,25 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     fun addSticker(asset: Filter){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.getSticker(changeFileEx(asset.name),STORAGE_STICKERS,object :DataSource.StickerLoadCallBack{
+                override fun onLocalLoad(bitmap: Bitmap) {
+                    _stickers.add(Sticker(RectF(0f,0f,_editorWidth.value/2f,_editorHeight.value/2f),bitmap.asImageBitmap()))
+                }
 
+                override fun onFireBaseLoad(bitmap: Bitmap) {
+                    _stickers.add(Sticker(RectF(0f,0f,_editorWidth.value/2f,_editorHeight.value/2f),bitmap.asImageBitmap()))
+                }
+
+                override fun onLoadFailed(e: Exception) {
+                }
+
+            })
+        }
+
+    }
+
+    private fun changeFileEx(oldName: String): String {
+        return oldName.replace(OLD_EXTENSION, NEW_EXTENSION)
     }
 }

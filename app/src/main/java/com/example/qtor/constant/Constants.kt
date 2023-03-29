@@ -47,3 +47,6 @@ const val LOADING = false
 const val INDILE = true
 const val STORAGE_FILTERS = "filters"
 const val ASSET_PATH = "file:///android_asset/"
+const val BASE_URL = "https://apis.clipdrop.co/"
+const val OLD_EXTENSION = "webp"
+const val NEW_EXTENSION = "png"

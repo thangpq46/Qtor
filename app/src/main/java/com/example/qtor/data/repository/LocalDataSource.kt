@@ -1,10 +1,12 @@
 package com.example.qtor.data.repository
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.ContextCompat
 import com.example.qtor.constant.IN_PAINTING_RADIUS
 import com.example.qtor.constant.STORAGE_STICKERS
 import com.example.qtor.data.model.Sticker
@@ -13,8 +15,9 @@ import org.opencv.android.Utils
 import org.opencv.core.Mat
 import org.opencv.imgproc.Imgproc
 import org.opencv.photo.Photo
+import java.io.File
 
-class LocalDataSource : DataSource {
+class LocalDataSource(private val context: Context) : DataSource {
     override suspend fun getStickers(
         application: Application,
         callback: DataSource.StickersCallback
@@ -66,6 +69,25 @@ class LocalDataSource : DataSource {
         )
         Utils.matToBitmap(matResult, output)
         callback.onLocalComplete(output.asImageBitmap())
+    }
+
+    override suspend fun getSticker(
+        name: String,
+        folderName: String,
+        callBack: DataSource.StickerLoadCallBack
+    ) {
+        val appDir = ContextCompat.getExternalFilesDirs(context, null)[0]
+        val filtersDir = File(appDir, folderName)
+        if (!filtersDir.exists()) {
+            filtersDir.mkdirs()
+        }
+        filtersDir.listFiles()?.let { files ->
+            for (file in files) {
+                if (file.name == name) {
+                    callBack.onLocalLoad(BitmapFactory.decodeStream(file.inputStream()))
+                }
+            }
+        }
     }
 
 }
