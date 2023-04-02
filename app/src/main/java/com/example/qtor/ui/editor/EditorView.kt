@@ -2,6 +2,7 @@ package com.example.qtor.ui.editor
 
 import android.content.Context
 import android.view.MotionEvent
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -94,6 +95,7 @@ fun EditorView(
         mutableStateOf(0f)
     }
 
+    val filter by viewModel.filter.collectAsState()
     fun moveImage() {
 
     }
@@ -341,6 +343,7 @@ fun EditorView(
                     }
                 }
             }
+            filter?.let { drawImage(it, dstOffset = IntOffset.Zero, alpha = FILTER_ALPHA, dstSize = IntSize(viewWidth,viewHeight)) }
         }
         when (mainToolActive) {
             MAIN_TOOl_REMOVE_OBJECT -> {

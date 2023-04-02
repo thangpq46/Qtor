@@ -5,6 +5,7 @@ import android.graphics.*
 import android.graphics.Matrix
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
@@ -53,6 +54,8 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _rectScale = MutableStateFlow(RectF(ZERO, ZERO, ZERO, ZERO))
     val rectScale: StateFlow<RectF> get() = _rectScale
 
+    private val _filter = MutableStateFlow<ImageBitmap?>(null)
+    val filter: StateFlow<ImageBitmap?> = _filter
 
     private val _currentBitmapIndex = MutableStateFlow(0)
     val currentBitmapIndex: StateFlow<Int> = _currentBitmapIndex
@@ -474,7 +477,46 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
+    fun setFilter(asset: Filter){
+        viewModelScope.launch(Dispatchers.IO) {
+            _stateScreen.value= LOADING
+            repository.getSticker(changeFileEx(asset.name), STORAGE_FILTERS,object :DataSource.StickerLoadCallBack{
+                override fun onLocalLoad(bitmap: Bitmap) {
+                    _filter.value=bitmap.asImageBitmap()
+                    _stateScreen.value= INDILE
+                }
+
+                override fun onFireBaseLoad(bitmap: Bitmap) {
+                    _filter.value=bitmap.asImageBitmap()
+                    _stateScreen.value= INDILE
+                }
+
+                override fun onLoadFailed(e: Exception) {
+                    _stateScreen.value= INDILE
+                    //TODO Handle err
+                }
+
+            })
+        }
+
+    }
+
     private fun changeFileEx(oldName: String): String {
         return oldName.replace(OLD_EXTENSION, NEW_EXTENSION)
+    }
+
+    private val _fonts = mutableStateListOf<Font>()
+    val fonts : List<Font> = _fonts
+    fun initFonts(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val assetManager = getApplication<Application>().assets
+            val fileList = assetManager.list(STORAGE_FONTS) ?: return@launch
+            val list = mutableListOf<Font>()
+            for (fileName in fileList) {
+                yield()
+                list.add(Font( "$STORAGE_FONTS/$fileName"))
+            }
+            _fonts.addAll(list)
+        }
     }
 }

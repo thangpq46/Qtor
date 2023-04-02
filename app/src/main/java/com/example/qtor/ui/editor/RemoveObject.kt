@@ -25,8 +25,14 @@ fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewMod
             EDIT_IMAGE_TOOl -> {
                 RemoveObjectTool(viewModel = viewModel)
             }
-            STICKER_TOOL->{
+            STICKER_TOOL -> {
                 StickersTool(viewModel = viewModel)
+            }
+            FILTERS_TOOl -> {
+                FiltersTool(viewModel)
+            }
+            TEXT_TOOL->{
+                TextTool(viewModel = viewModel)
             }
         }
         LazyRow(
@@ -56,15 +62,16 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
     val bottomMenuItemsList = prepareBottomMenu()
     val itemActive by viewModel.removeObjectToolActive.collectAsState()
     val bitmapIndex by viewModel.currentBitmapIndex.collectAsState()
-    val AIObjects =viewModel.imageBitmaps[bitmapIndex].AIObj
+    val AIObjects = viewModel.imageBitmaps[bitmapIndex].AIObj
     Column {
         when (itemActive) {
             DETECT_OBJECT_MODE -> {
-                AITool(objects = AIObjects, onClick = {index,item->
-                    viewModel.removeObject(obj =  item){
+                AITool(objects = AIObjects, onClick = { index, item ->
+                    viewModel.removeObject(obj = item) {
                         //TODO
                     }
-                })}
+                })
+            }
         }
         BottomNavigation(
             modifier = modifier,
@@ -126,11 +133,11 @@ fun ProgressBar() {
 }
 
 @Composable
-fun AITool(objects: List<AITarget>, onClick: (Int,AITarget) -> Unit) {
+fun AITool(objects: List<AITarget>, onClick: (Int, AITarget) -> Unit) {
     LazyRow {
-        itemsIndexed(items = objects) { index,item ->
-            AIItem(item = item){
-                onClick(index,item)
+        itemsIndexed(items = objects) { index, item ->
+            AIItem(item = item) {
+                onClick(index, item)
             }
         }
     }

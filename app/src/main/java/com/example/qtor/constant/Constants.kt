@@ -10,16 +10,16 @@ val LIST_OF_TOOLS = mutableListOf(
     "Adjust",
     "Effects",
     "Stickers",
-    "Time stamp",
     "Text",
-    "Brush",
+    "Time stamp",
     "Draw shapes",
     "Add photos",
-    "Background",
     "AI filter"
 )
 const val EDIT_IMAGE_TOOl = 1
 const val STICKER_TOOL = 6
+const val TEXT_TOOL = 7
+const val FILTERS_TOOl = 3
 const val STORAGE_STICKERS = "stickers"
 const val ZERO = 0f
 const val ITEM_ACTIVE_NULL = -1
@@ -46,7 +46,9 @@ const val DRAW_ALPHA = 0.6f
 const val LOADING = false
 const val INDILE = true
 const val STORAGE_FILTERS = "filters"
+const val STORAGE_FONTS = "fonts"
 const val ASSET_PATH = "file:///android_asset/"
 const val BASE_URL = "https://apis.clipdrop.co/"
 const val OLD_EXTENSION = "webp"
 const val NEW_EXTENSION = "png"
+const val FILTER_ALPHA = 0.3f
