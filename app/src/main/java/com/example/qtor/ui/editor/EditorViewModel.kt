@@ -332,7 +332,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     private val dptoPx = application.resources.displayMetrics.density
-    private fun getMaskBitmap(path: Path?, obj: AITarget? = null): Bitmap {
+    private fun getMaskBitmap(path: Path?, obj: AITarget? = null,mode: Int): Bitmap {
         val result =
             Bitmap.createBitmap(_editorWidth.value, _editorHeight.value, Bitmap.Config.ARGB_8888)
                 .asImageBitmap()
@@ -344,9 +344,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                 style = PaintingStyle.Fill
             })
         val paint = Paint().apply {
-            style = PaintingStyle.Stroke
+            style = if (mode== BRUSH_MODE) PaintingStyle.Stroke else PaintingStyle.Fill
             color = Color.White
-            strokeWidth = 20 * dptoPx
+            strokeWidth = if (mode== BRUSH_MODE) 20 * dptoPx else 5 * dptoPx
         }
         path?.let {
             canvas.drawPath(path, paint)
@@ -368,11 +368,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _stateScreen = MutableStateFlow(INDILE)
     val stateScreen: StateFlow<Boolean> = _stateScreen
-    fun removeObject(path: Path? = null, obj: AITarget? = null, onComplete: () -> Unit) {
+    fun removeObject(path: Path? = null, obj: AITarget? = null,mode:Int = BRUSH_MODE, onComplete: () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
             val image = _imageActions[_currentBitmapIndex.value].image.asAndroidBitmap()
-            val mask = getMaskBitmap(path, obj)
+            val mask = getMaskBitmap(path, obj,mode)
             repository.cleanupBitmap(image, mask, object : DataSource.EraserObjectCallback {
                 override fun onLocalComplete(result: ImageBitmap) {
                     if (_currentBitmapIndex.value < _imageActions.lastIndex) {

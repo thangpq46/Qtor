@@ -12,10 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -65,7 +62,6 @@ fun EditorView(
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
     //icon
-    val drawColor = MaterialTheme.colors.primary
     val icDelete = context.getDrawable(R.drawable.ic_delete)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
@@ -99,7 +95,7 @@ fun EditorView(
     fun moveImage() {
 
     }
-
+    val drawColor = MaterialTheme.colors.primary
     fun processActionToolRemove(event: MotionEvent): Boolean {
         return when (removeObjectToolActive) {
             DETECT_OBJECT_MODE -> {
@@ -140,7 +136,37 @@ fun EditorView(
                 }
             }
             LASSO_MODE -> {
-                true
+                return when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        if (event.pointerCount == 1) {
+                            downX = event.x
+                            downY = event.y
+                            path?.moveTo(downX, downY)
+                        }
+                        true
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        if (event.pointerCount == 1) {
+                            path?.lineTo(event.x, event.y)
+                            val temp = path
+                            path = null
+                            path = temp
+                        } else if (event.pointerCount == 2) {
+                            moveImage()
+                        }
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        path?.lineTo(downX,downY)
+                        viewModel.removeObject(path, mode = LASSO_MODE){
+                            path = Path()
+                        }
+                        true
+                    }
+                    else -> {
+                        true
+                    }
+                }
             }
             else -> {
                 true
@@ -360,8 +386,9 @@ fun EditorView(
                 }
                 path?.let {
                     drawPath(
-                        it, Color.White, style = Stroke(
-                            width = 10.dp.toPx()
+                        it, drawColor, style = Stroke(
+                            pathEffect = if (removeObjectToolActive == BRUSH_MODE) null else PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f),
+                            width = if (removeObjectToolActive == BRUSH_MODE) 10.dp.toPx() else 2.dp.toPx()
                         ), alpha = .6f
                     )
                 }
