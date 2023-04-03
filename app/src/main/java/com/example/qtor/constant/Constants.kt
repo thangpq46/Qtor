@@ -52,3 +52,4 @@ const val BASE_URL = "https://apis.clipdrop.co/"
 const val OLD_EXTENSION = "webp"
 const val NEW_EXTENSION = "png"
 const val FILTER_ALPHA = 0.3f
+const val ONE_SECOND=1000L
