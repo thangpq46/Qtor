@@ -11,6 +11,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,6 +28,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
@@ -36,6 +42,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.delay
+import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
 
@@ -66,7 +73,7 @@ class MainActivity : ComponentActivity() {
 fun MainActivityUI(onClick:()->Unit) {
     QTorTheme {
         Surface(modifier= Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val screenHeight =  LocalConfiguration.current.screenHeightDp.dp
                 val images = listOf(
                     ImageBitmap.imageResource(R.drawable.demo1),
@@ -76,11 +83,18 @@ fun MainActivityUI(onClick:()->Unit) {
                     ImageBitmap.imageResource(R.drawable.demo5),
                     ImageBitmap.imageResource(R.drawable.demo6),
                 )
-
+                val tools = listOf(
+                    R.drawable.ic_template,
+                    R.drawable.ic_remove_object,
+                    R.drawable.ic_portrait,
+                    R.drawable.ic_filter,
+                    R.drawable.ic_adjust,
+                    R.drawable.ic_effects,
+                    R.drawable.ic_template,
+                    R.drawable.ic_remove_object,
+                )
                 Card(
-                    modifier = Modifier
-//                        .padding(16.dp)
-                    ,
+                    modifier = Modifier,
                     shape = RoundedCornerShape(5.dp),
                 ) {
                     AutoSlidingCarousel(
@@ -95,11 +109,26 @@ fun MainActivityUI(onClick:()->Unit) {
                         }
                     )
                 }
-                Text(text = "EDIT", modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(true, onClick = {
-                        onClick()
-                    }))
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 80.dp),
+                    contentPadding = PaddingValues(vertical = 0.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp)
+                        .height(LocalConfiguration.current.screenHeightDp.dp * 3 / 10f)
+                ) {
+                    items(tools) { id ->
+                        // Replace this with your item composable
+                        Image(painter = painterResource(id = id), contentDescription = null, modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 40.dp))
+                    }
+                }
+                Button(onClick = { onClick() }) {
+                    Text(text = "START EDITING", modifier = Modifier
+                        .fillMaxWidth(.7f), textAlign = TextAlign.Center, fontSize = MaterialTheme.typography.h5.fontSize
+                        )
+                }
             }
         }
     }

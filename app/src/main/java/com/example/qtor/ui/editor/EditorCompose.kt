@@ -3,10 +3,7 @@ package com.example.qtor.ui.editor
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -63,6 +60,13 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
                     .fillMaxSize()
                     .weight(7f), viewModel = viewModel
             )
+
+        }
+        Column(Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
+
+        ) {
             Row {
                 CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_undo)) {
                     viewModel.undo()
