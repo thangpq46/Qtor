@@ -1,3 +1,3 @@
 package com.example.qtor.data.model
 
-data class Tool(val index:Int)
+data class Tool(val resourceID: Int, val toolNameID: Int)

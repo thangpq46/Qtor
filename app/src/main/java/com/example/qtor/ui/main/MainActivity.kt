@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.example.qtor.R
 import com.example.qtor.constant.IMAGE_TO_EDIT
 import com.example.qtor.constant.ONE_SECOND
 import com.example.qtor.constant.TYPE_ALL_IMAGE
+import com.example.qtor.data.model.Tool
 import com.example.qtor.ui.editor.EditorActivity
 import com.example.qtor.ui.theme.QTorTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -70,11 +72,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MainActivityUI(onClick:()->Unit) {
+fun MainActivityUI(onClick: () -> Unit) {
     QTorTheme {
-        Surface(modifier= Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val screenHeight =  LocalConfiguration.current.screenHeightDp.dp
+                val screenHeight = LocalConfiguration.current.screenHeightDp.dp
                 val images = listOf(
                     ImageBitmap.imageResource(R.drawable.demo1),
                     ImageBitmap.imageResource(R.drawable.demo2),
@@ -84,14 +86,14 @@ fun MainActivityUI(onClick:()->Unit) {
                     ImageBitmap.imageResource(R.drawable.demo6),
                 )
                 val tools = listOf(
-                    R.drawable.ic_template,
-                    R.drawable.ic_remove_object,
-                    R.drawable.ic_portrait,
-                    R.drawable.ic_filter,
-                    R.drawable.ic_adjust,
-                    R.drawable.ic_effects,
-                    R.drawable.ic_template,
-                    R.drawable.ic_remove_object,
+                    Tool(R.drawable.ic_template, R.string.tool_template),
+                    Tool(R.drawable.ic_remove_object, R.string.tool_remove_object),
+                    Tool(R.drawable.ic_portrait, R.string.tool_portrait),
+                    Tool(R.drawable.ic_filter, R.string.tool_filters),
+                    Tool(R.drawable.ic_adjust, R.string.tool_Adjust),
+                    Tool(R.drawable.ic_effects, R.string.tool_effects),
+                    Tool(R.drawable.ic_template, R.string.tool_stickers),
+                    Tool(R.drawable.ic_remove_object, R.string.tool_text)
                 )
                 Card(
                     modifier = Modifier,
@@ -104,7 +106,7 @@ fun MainActivityUI(onClick:()->Unit) {
                                 images[index],
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.height(screenHeight/2)
+                                modifier = Modifier.height(screenHeight / 2)
                             )
                         }
                     )
@@ -117,17 +119,41 @@ fun MainActivityUI(onClick:()->Unit) {
                         .padding(vertical = 10.dp)
                         .height(LocalConfiguration.current.screenHeightDp.dp * 3 / 10f)
                 ) {
-                    items(tools) { id ->
+                    items(tools) { tool ->
                         // Replace this with your item composable
-                        Image(painter = painterResource(id = id), contentDescription = null, modifier = Modifier
-                            .fillMaxSize()
-                            .padding(vertical = 40.dp))
+                        Surface(modifier = Modifier
+                            .padding(vertical = 15.dp)
+                            .clickable {
+
+                            }) {
+                            Column {
+                                Image(
+                                    painter = painterResource(id = tool.resourceID),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(vertical = 10.dp)
+                                )
+                                Text(
+                                    text = stringResource(id = tool.toolNameID),
+                                    textAlign = TextAlign.Center,
+                                    fontSize = MaterialTheme.typography.h6.fontSize,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
+                        }
+
                     }
                 }
                 Button(onClick = { onClick() }) {
-                    Text(text = "START EDITING", modifier = Modifier
-                        .fillMaxWidth(.7f), textAlign = TextAlign.Center, fontSize = MaterialTheme.typography.h5.fontSize
-                        )
+                    Text(
+                        text = "START EDITING",
+                        modifier = Modifier
+                            .fillMaxWidth(.8f),
+                        textAlign = TextAlign.Center,
+                        fontSize = MaterialTheme.typography.h6.fontSize
+                    )
                 }
             }
         }
@@ -161,6 +187,7 @@ fun DotsIndicator(
         }
     }
 }
+
 @Composable
 fun IndicatorDot(
     modifier: Modifier = Modifier,

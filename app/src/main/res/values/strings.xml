@@ -3,4 +3,12 @@
     <string name="title_activity_editor">EditorActivity</string>
     <string name="title_editor">Editor</string>
     <string name="text_demo_font">ABCDEFGH</string>
+    <string name="tool_template">Template</string>
+    <string name="tool_remove_object">Remove</string>
+    <string name="tool_portrait">Portrait</string>
+    <string name="tool_filters">Filters</string>
+    <string name="tool_Adjust">Adjust</string>
+    <string name="tool_effects">Effects</string>
+    <string name="tool_stickers">Stickers</string>
+    <string name="tool_text">Text</string>
 </resources>
