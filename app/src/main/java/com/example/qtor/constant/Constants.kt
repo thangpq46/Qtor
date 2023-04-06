@@ -53,3 +53,4 @@ const val OLD_EXTENSION = "webp"
 const val NEW_EXTENSION = "png"
 const val FILTER_ALPHA = 0.3f
 const val ONE_SECOND=1000L
+const val TOOL_INIT_INDEX="ToolActive"

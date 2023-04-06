@@ -11,10 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -36,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.qtor.R
 import com.example.qtor.constant.IMAGE_TO_EDIT
 import com.example.qtor.constant.ONE_SECOND
+import com.example.qtor.constant.TOOL_INIT_INDEX
 import com.example.qtor.constant.TYPE_ALL_IMAGE
 import com.example.qtor.data.model.Tool
 import com.example.qtor.ui.editor.EditorActivity
@@ -48,6 +46,7 @@ import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
 
+    var toolIndex: Int? = null
     private val pickImageToEditor =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
@@ -56,6 +55,9 @@ class MainActivity : ComponentActivity() {
                     EditorActivity::class.java
                 ).apply {
                     putExtra(IMAGE_TO_EDIT, uri.toString())
+                    toolIndex?.let {
+                        putExtra(TOOL_INIT_INDEX,it)
+                    }
                 })
             }
         }
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainActivityUI {
+                toolIndex=it
                 pickImageToEditor.launch(TYPE_ALL_IMAGE)
             }
         }
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MainActivityUI(onClick: () -> Unit) {
+fun MainActivityUI(onClick: (Int?) -> Unit) {
     QTorTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -119,12 +122,12 @@ fun MainActivityUI(onClick: () -> Unit) {
                         .padding(vertical = 10.dp)
                         .height(LocalConfiguration.current.screenHeightDp.dp * 3 / 10f)
                 ) {
-                    items(tools) { tool ->
+                    itemsIndexed(tools) {index, tool ->
                         // Replace this with your item composable
                         Surface(modifier = Modifier
                             .padding(vertical = 15.dp)
                             .clickable {
-
+                                onClick(index)
                             }) {
                             Column {
                                 Image(
@@ -146,7 +149,7 @@ fun MainActivityUI(onClick: () -> Unit) {
 
                     }
                 }
-                Button(onClick = { onClick() }) {
+                Button(onClick = { onClick(null) }) {
                     Text(
                         text = "START EDITING",
                         modifier = Modifier

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import com.example.qtor.R
 import com.example.qtor.constant.IMAGE_TO_EDIT
 import com.example.qtor.constant.LOADING
+import com.example.qtor.constant.TOOL_INIT_INDEX
 import com.example.qtor.ui.editor.ui.theme.QTorTheme
 import org.opencv.android.OpenCVLoader
 
@@ -24,6 +25,9 @@ class EditorActivity : ComponentActivity() {
         OpenCVLoader.initDebug()
         intent.getStringExtra(IMAGE_TO_EDIT)?.let {
             viewModel.initBitmaps(Uri.parse(it))
+        }
+        intent.getIntExtra(TOOL_INIT_INDEX,0).let {
+            viewModel.setMainToolActive(it)
         }
         setContent {
             QTorTheme {
