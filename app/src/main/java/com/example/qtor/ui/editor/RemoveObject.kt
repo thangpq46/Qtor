@@ -34,6 +34,9 @@ fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewMod
             TEXT_TOOL->{
                 TextTool(viewModel = viewModel)
             }
+            ADJUST_TOOL->{
+                adjustTools(viewModel = viewModel)
+            }
         }
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -62,7 +65,11 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
     val bottomMenuItemsList = prepareBottomMenu()
     val itemActive by viewModel.removeObjectToolActive.collectAsState()
     val bitmapIndex by viewModel.currentBitmapIndex.collectAsState()
-    val AIObjects = viewModel.imageBitmaps[bitmapIndex].AIObj
+    val AIObjects = if (viewModel.imageBitmaps.isNotEmpty()){
+        viewModel.imageBitmaps[bitmapIndex].AIObj
+    } else{
+        mutableListOf()
+    }
     Column {
         when (itemActive) {
             DETECT_OBJECT_MODE -> {

@@ -11,4 +11,16 @@
     <string name="tool_effects">Effects</string>
     <string name="tool_stickers">Stickers</string>
     <string name="tool_text">Text</string>
+    <string name="adjust_brightness">Brightness</string>
+    <string name="adjust_brilliance">Brilliance</string>
+    <string name="adjust_saturation">Saturation</string>
+    <string name="adjust_contrast">Contrast</string>
+    <string name="adjust_vibrance">Vibrance</string>
+    <string name="adjust_sharpen">Sharpen</string>
+    <string name="adjust_Grain">Grain</string>
+    <string name="adjust_highlight">Highlight</string>
+    <string name="adjust_shadow">Shadows</string>
+    <string name="adjust_fade">Fade</string>
+    <string name="adjust_warmth">Warmth</string>
+    <string name="adjust_Tint">Tint</string>
 </resources>

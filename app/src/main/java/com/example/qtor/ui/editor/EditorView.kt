@@ -2,7 +2,6 @@ package com.example.qtor.ui.editor
 
 import android.content.Context
 import android.view.MotionEvent
-import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -13,7 +12,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -59,6 +57,11 @@ fun EditorView(
     var scaleF by remember {
         mutableStateOf(1f)
     }
+    //Adjust
+    val brightness by viewModel.brightness.collectAsState()
+    val saturation by viewModel.saturation.collectAsState()
+
+
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
     //icon
@@ -90,12 +93,36 @@ fun EditorView(
     var drawY by remember {
         mutableStateOf(0f)
     }
+    var colorFilter = ColorMatrix()
 
+    LaunchedEffect(saturation ){
+        colorFilter.setToSaturation(saturation)
+//        colorFilter.setToScale(brightness,brightness,brightness,1f)
+    }
+    LaunchedEffect(brightness ){
+//        colorFilter.setToSaturation(saturation)
+//        colorFilter.setToScale(brightness,brightness,brightness,1f)
+    }
     val filter by viewModel.filter.collectAsState()
     fun moveImage() {
 
     }
     val drawColor = MaterialTheme.colors.primary
+
+    fun processScaleAndMoveView(event: MotionEvent): Boolean {
+        drawX += (event.getX(0) - downX)
+        drawY += (event.getY(0) - downY)
+        currentDistance = getDistance(event)
+        val s = (currentDistance / preDistance)
+        if (s in 0.9f..1.1f) {
+            scaleF *= (currentDistance / preDistance)
+        }
+        downX = event.getX(0)
+        downY = event.getY(0)
+        preDistance = currentDistance
+        return true
+    }
+
     fun processActionToolRemove(event: MotionEvent): Boolean {
         return when (removeObjectToolActive) {
             DETECT_OBJECT_MODE -> {
@@ -108,6 +135,8 @@ fun EditorView(
                             downX = event.x
                             downY = event.y
                             path?.moveTo(downX, downY)
+                        }else{
+                            preDistance= getDistance(event)
                         }
                         true
                     }
@@ -120,12 +149,12 @@ fun EditorView(
                             path = null
                             path = temp
                         } else if (event.pointerCount == 2) {
-                            moveImage()
+                            processScaleAndMoveView(event)
                         }
                         true
                     }
                     MotionEvent.ACTION_UP -> {
-                        viewModel.removeObject(path){
+                        viewModel.removeObject(path) {
                             path = Path()
                         }
                         true
@@ -152,13 +181,13 @@ fun EditorView(
                             path = null
                             path = temp
                         } else if (event.pointerCount == 2) {
-                            moveImage()
+                            processScaleAndMoveView(event)
                         }
                         true
                     }
                     MotionEvent.ACTION_UP -> {
-                        path?.lineTo(downX,downY)
-                        viewModel.removeObject(path, mode = LASSO_MODE){
+                        path?.lineTo(downX, downY)
+                        viewModel.removeObject(path, mode = LASSO_MODE) {
                             path = Path()
                         }
                         true
@@ -267,7 +296,7 @@ fun EditorView(
                     downX = event.x
                     downY = event.y
                 } else {
-                    //TODO ("Move image")
+                    processScaleAndMoveView(event)
                 }
                 true
             }
@@ -281,31 +310,28 @@ fun EditorView(
         }
     }
 
-    fun processScaleAndMoveView(event: MotionEvent): Boolean {
-        drawX += (event.getX(0) - downX) / d.density
-        drawY += (event.getY(0) - downY) / d.density
-        currentDistance = getDistance(event)
-        val s = (currentDistance / preDistance)
-        if (s in 0.9f..1.1f) {
-            scaleF *= (currentDistance / preDistance)
-        }
-        downX = event.getX(0)
-        downY = event.getY(0)
-        preDistance = currentDistance
-        return true
-    }
-
     Canvas(modifier = Modifier
-        .offset((drawX / d.density).dp, (drawY / d.density).dp)
+//        .offset((drawX / d.density).dp, (drawY / d.density).dp)
         .width(with(LocalDensity.current) { viewWidth.toDp() })
         .height(with(LocalDensity.current) { viewHeight.toDp() })
-        .scale(scaleF)
+//        .scale(scaleF)
+        .graphicsLayer {
+            this.translationX=drawX
+            this.translationY=drawY
+            this.scaleX=scaleF
+            this.scaleY=scaleF
+        }
         .drawBehind {
-            drawImage(
-                imageBitmaps[currentBitmapIndex].image,
-                dstOffset = IntOffset.Zero,
-                dstSize = IntSize(viewWidth, viewHeight)
-            )
+            if (imageBitmaps.isNotEmpty()){
+                drawImage(
+                    imageBitmaps[currentBitmapIndex].image,
+                    dstOffset = IntOffset.Zero,
+                    dstSize = IntSize(viewWidth, viewHeight),
+                    colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply {
+                        setToSaturation(saturation)
+                    })
+                )
+            }
         }
         .pointerInteropFilter { event ->
             when (mainToolActive) {
@@ -369,12 +395,19 @@ fun EditorView(
                     }
                 }
             }
-            filter?.let { drawImage(it, dstOffset = IntOffset.Zero, alpha = FILTER_ALPHA, dstSize = IntSize(viewWidth,viewHeight)) }
+            filter?.let {
+                drawImage(
+                    it,
+                    dstOffset = IntOffset.Zero,
+                    alpha = FILTER_ALPHA,
+                    dstSize = IntSize(viewWidth, viewHeight)
+                )
+            }
         }
         when (mainToolActive) {
             MAIN_TOOl_REMOVE_OBJECT -> {
-                when(removeObjectToolActive){
-                    DETECT_OBJECT_MODE->{
+                when (removeObjectToolActive) {
+                    DETECT_OBJECT_MODE -> {
                         for (obj in imageBitmaps[currentBitmapIndex].AIObj) {
                             drawRect(
                                 Color.Green, obj.box.offset(), obj.box.Size(), style = Stroke(
@@ -387,7 +420,10 @@ fun EditorView(
                 path?.let {
                     drawPath(
                         it, drawColor, style = Stroke(
-                            pathEffect = if (removeObjectToolActive == BRUSH_MODE) null else PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f),
+                            pathEffect = if (removeObjectToolActive == BRUSH_MODE) null else PathEffect.dashPathEffect(
+                                floatArrayOf(10f, 10f),
+                                0f
+                            ),
                             width = if (removeObjectToolActive == BRUSH_MODE) 10.dp.toPx() else 2.dp.toPx()
                         ), alpha = .6f
                     )

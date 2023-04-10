@@ -11,6 +11,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -33,9 +34,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import androidx.compose.ui.text.font.FontFamily
+
+//    import android.graphics.Color
+//    import android.graphics.Typeface
+//    import androidx.compose.ui.graphics.ColorFilter
+//    import androidx.compose.ui.graphics.ColorMatrix
+//    import androidx.compose.ui.graphics.ColorMatrixFilter
+//    import androidx.compose.ui.graphics.ImageBitmap
+//    import androidx.compose.ui.graphics.asImageBitmap
+
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
-//    private val repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
+    //    private val repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
     private val _imageActions = mutableStateListOf<ImageAction>()
     val imageBitmaps: List<ImageAction> = _imageActions
     private val _stickers = mutableStateListOf<Sticker>()
@@ -332,7 +343,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     private val dptoPx = application.resources.displayMetrics.density
-    private fun getMaskBitmap(path: Path?, obj: AITarget? = null,mode: Int): Bitmap {
+    private fun getMaskBitmap(path: Path?, obj: AITarget? = null, mode: Int): Bitmap {
         val result =
             Bitmap.createBitmap(_editorWidth.value, _editorHeight.value, Bitmap.Config.ARGB_8888)
                 .asImageBitmap()
@@ -344,9 +355,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                 style = PaintingStyle.Fill
             })
         val paint = Paint().apply {
-            style = if (mode== BRUSH_MODE) PaintingStyle.Stroke else PaintingStyle.Fill
+            style = if (mode == BRUSH_MODE) PaintingStyle.Stroke else PaintingStyle.Fill
             color = Color.White
-            strokeWidth = if (mode== BRUSH_MODE) 20 * dptoPx else 5 * dptoPx
+            strokeWidth = if (mode == BRUSH_MODE) 20 * dptoPx else 5 * dptoPx
         }
         path?.let {
             canvas.drawPath(path, paint)
@@ -368,11 +379,16 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _stateScreen = MutableStateFlow(INDILE)
     val stateScreen: StateFlow<Boolean> = _stateScreen
-    fun removeObject(path: Path? = null, obj: AITarget? = null,mode:Int = BRUSH_MODE, onComplete: () -> Unit) {
+    fun removeObject(
+        path: Path? = null,
+        obj: AITarget? = null,
+        mode: Int = BRUSH_MODE,
+        onComplete: () -> Unit
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
             val image = _imageActions[_currentBitmapIndex.value].image.asAndroidBitmap()
-            val mask = getMaskBitmap(path, obj,mode)
+            val mask = getMaskBitmap(path, obj, mode)
             repository.cleanupBitmap(image, mask, object : DataSource.EraserObjectCallback {
                 override fun onLocalComplete(result: ImageBitmap) {
                     if (_currentBitmapIndex.value < _imageActions.lastIndex) {
@@ -458,45 +474,69 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
     }
 
-    fun addSticker(asset: Filter){
+    fun addSticker(asset: Filter) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getSticker(changeFileEx(asset.name),STORAGE_STICKERS,object :DataSource.StickerLoadCallBack{
-                override fun onLocalLoad(bitmap: Bitmap) {
-                    _stickers.add(Sticker(RectF(0f,0f,_editorWidth.value/2f,_editorHeight.value/2f),bitmap.asImageBitmap()))
-                }
+            repository.getSticker(
+                changeFileEx(asset.name),
+                STORAGE_STICKERS,
+                object : DataSource.StickerLoadCallBack {
+                    override fun onLocalLoad(bitmap: Bitmap) {
+                        val left = _editorWidth.value / 2f - bitmap.width / 2
+                        val top = _editorHeight.value / 2f - bitmap.height / 2
+                        val right = left + bitmap.width
+                        val bottom = top + bitmap.height
+                        _stickers.add(
+                            Sticker(
+                                RectF(left, top, right, bottom),
+                                bitmap.asImageBitmap()
+                            )
+                        )
+                    }
 
-                override fun onFireBaseLoad(bitmap: Bitmap) {
-                    _stickers.add(Sticker(RectF(0f,0f,_editorWidth.value/2f,_editorHeight.value/2f),bitmap.asImageBitmap()))
-                }
+                    override fun onFireBaseLoad(bitmap: Bitmap) {
+                        val left = _editorWidth.value / 2f - bitmap.width / 2
+                        val top = _editorHeight.value / 2f - bitmap.height / 2
+                        val right = left + bitmap.width
+                        val bottom = top + bitmap.height
+                        _stickers.add(
+                            Sticker(
+                                RectF(left, top, right, bottom),
+                                bitmap.asImageBitmap()
+                            )
+                        )
+                    }
 
-                override fun onLoadFailed(e: Exception) {
-                }
+                    override fun onLoadFailed(e: Exception) {
+                    }
 
-            })
+                })
         }
 
     }
 
-    fun setFilter(asset: Filter){
+    fun setFilter(asset: Filter) {
         viewModelScope.launch(Dispatchers.IO) {
-            _stateScreen.value= LOADING
-            repository.getSticker(changeFileEx(asset.name), STORAGE_FILTERS,object :DataSource.StickerLoadCallBack{
-                override fun onLocalLoad(bitmap: Bitmap) {
-                    _filter.value=bitmap.asImageBitmap()
-                    _stateScreen.value= INDILE
-                }
+            _stateScreen.value = LOADING
+            repository.getSticker(
+                changeFileEx(asset.name),
+                STORAGE_FILTERS,
+                object : DataSource.StickerLoadCallBack {
+                    override fun onLocalLoad(bitmap: Bitmap) {
+                        _filter.value = bitmap.asImageBitmap()
+                        _stateScreen.value = INDILE
+                    }
 
-                override fun onFireBaseLoad(bitmap: Bitmap) {
-                    _filter.value=bitmap.asImageBitmap()
-                    _stateScreen.value= INDILE
-                }
+                    override fun onFireBaseLoad(bitmap: Bitmap) {
+                        _filter.value = bitmap.asImageBitmap()
+                        _stateScreen.value = INDILE
+                    }
 
-                override fun onLoadFailed(e: Exception) {
-                    _stateScreen.value= INDILE
-                    //TODO Handle err
-                }
+                    override fun onLoadFailed(e: Exception) {
+                        _stateScreen.value = INDILE
+                        //TODO Handle err
+                    }
 
-            })
+                })
         }
 
     }
@@ -506,17 +546,59 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     private val _fonts = mutableStateListOf<Font>()
-    val fonts : List<Font> = _fonts
-    fun initFonts(){
+    val fonts: List<Font> = _fonts
+    fun initFonts() {
         viewModelScope.launch(Dispatchers.IO) {
             val assetManager = getApplication<Application>().assets
             val fileList = assetManager.list(STORAGE_FONTS) ?: return@launch
             val list = mutableListOf<Font>()
             for (fileName in fileList) {
                 yield()
-                list.add(Font( "$STORAGE_FONTS/$fileName"))
+                list.add(Font("$STORAGE_FONTS/$fileName"))
             }
             _fonts.addAll(list)
         }
     }
+
+    private val _brightness = MutableStateFlow(0f)
+    val brightness: StateFlow<Float> = _brightness
+
+    fun setBrightness(process: Float) {
+        _brightness.value = process
+    }
+
+    private val _brilliance = MutableStateFlow(1f)
+    val brilliance: StateFlow<Float> = _brilliance
+
+    fun setBrilliance(process: Float) {
+        _brilliance.value = (process + FIFTH_TI) / HUREND
+    }
+
+    private val _saturation = MutableStateFlow(1f)
+    val saturation: StateFlow<Float> = _saturation
+    fun setSaturation(process: Float) {
+        _saturation.value = process / 100
+    }
+
+    private val _contrast = MutableStateFlow(1f)
+    val contrast: StateFlow<Float> = _contrast
+    fun setContrast(process: Float) {
+        _contrast.value = process / HUREND
+    }
+
+
+    fun addText(text:String,fontName: String?,fontSize:Float){
+        viewModelScope.launch(Dispatchers.IO) {
+            val bitmap  = createImageBitmapFromText(application,text,fontName)
+            val left = _editorWidth.value / 2f - bitmap.width / 2
+            val top = _editorHeight.value / 2f - bitmap.height / 2
+            val right = left + bitmap.width
+            val bottom = top + bitmap.height
+            addSticker(Sticker(
+                RectF(left, top, right, bottom),
+                bitmap.asImageBitmap()
+            ))
+        }
+    }
+
 }

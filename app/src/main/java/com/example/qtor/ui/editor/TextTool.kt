@@ -45,7 +45,9 @@ fun TextTool(viewModel: EditorViewModel) {
             fontFamily = userTextFont?.let { fontFamily(fontName = it) }
         ))
         IconButton(modifier = Modifier.weight(1f),onClick = {
-//           TODO add
+            if (text.isNotEmpty()){
+                viewModel.addText(text,userTextFont,12f)
+            }
         }) {
             Text(text = "ADD")
         }
