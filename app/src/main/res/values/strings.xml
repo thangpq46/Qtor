@@ -23,4 +23,5 @@
     <string name="adjust_fade">Fade</string>
     <string name="adjust_warmth">Warmth</string>
     <string name="adjust_Tint">Tint</string>
+    <string name="text_place_holder">Please Type Here…</string>
 </resources>
