@@ -3,6 +3,7 @@ package com.example.qtor.ui.editor
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
 import com.example.qtor.constant.LOADING
+import com.example.qtor.constant.MAIN_TOOl_REMOVE_OBJECT
 import com.example.qtor.constant.STORAGE_FILTERS
 import com.example.qtor.constant.STORAGE_STICKERS
 
@@ -46,6 +48,7 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
         color = MaterialTheme.colors.background
     ) {
         val state by viewModel.stateScreen.collectAsState()
+        val mainToolActive by viewModel.mainToolActive.collectAsState()
         Column(
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -56,9 +59,7 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
             }
             EditorView(
                 context,
-                Modifier
-                    .fillMaxSize()
-                    .weight(7f), viewModel = viewModel
+                viewModel = viewModel
             )
 
         }
@@ -67,12 +68,16 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
             verticalArrangement = Arrangement.Bottom
 
         ) {
-            Row {
-                CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_undo)) {
-                    viewModel.undo()
-                }
-                CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_redo)) {
-                    viewModel.redo()
+            if (mainToolActive== MAIN_TOOl_REMOVE_OBJECT){
+                Row(horizontalArrangement = Arrangement.Start , modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()) {
+                    CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_undo)) {
+                        viewModel.undo()
+                    }
+                    CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_redo)) {
+                        viewModel.redo()
+                    }
                 }
             }
             BottomNavigationTool(
@@ -80,6 +85,11 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
                     .background(MaterialTheme.colors.onSurface)
                     .weight(2f), viewModel = viewModel
             )
+        }
+        if (!state){
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .clickable { }) {}
         }
     }
 }

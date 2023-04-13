@@ -7,11 +7,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
@@ -19,9 +25,9 @@ import com.example.qtor.data.model.BottomMenuItem
 
 @Composable
 fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) {
-    val tool by viewModel.mainToolActive.collectAsState()
+    val mainToolActive by viewModel.mainToolActive.collectAsState()
     Column {
-        when (tool) {
+        when (mainToolActive) {
             EDIT_IMAGE_TOOl -> {
                 RemoveObjectTool(viewModel = viewModel)
             }
@@ -42,7 +48,7 @@ fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewMod
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             itemsIndexed(items = LIST_OF_TOOLS) { index, tool ->
-                MainTool(tool) {
+                MainTool(tool,index==mainToolActive) {
                     viewModel.setMainToolActive(index)
                 }
             }
@@ -108,12 +114,15 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
 }
 
 @Composable
-fun MainTool(tool: String, onClick: () -> Unit) {
-    Text(text = tool, modifier = Modifier
-        .width(70.dp)
-        .clickable(true, null, null) {
-            onClick()
-        })
+fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.height(50.dp).clickable {
+        onClick()
+    }) {
+        Text(text = tool, modifier = Modifier
+            .width(70.dp)
+            , fontSize = 16.sp, color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant
+        )
+    }
 }
 
 @Composable

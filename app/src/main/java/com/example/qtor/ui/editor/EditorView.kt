@@ -4,20 +4,16 @@ import android.content.Context
 import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -28,8 +24,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.util.*
-import androidx.compose.foundation.gestures.calculatePan
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.drawscope.Fill
 
 
@@ -37,10 +31,8 @@ import androidx.compose.ui.graphics.drawscope.Fill
 @Composable
 fun EditorView(
     context: Context,
-    modifier: Modifier = Modifier,
     viewModel: EditorViewModel
 ) {
-//    viewModel.initStickerS()
     val imageBitmaps = viewModel.imageBitmaps
     val currentBitmapIndex by viewModel.currentBitmapIndex.collectAsState()
     val viewWidth by viewModel.editorWidth.collectAsState()
@@ -72,7 +64,7 @@ fun EditorView(
     //Adjust
     val brightness by viewModel.brightness.collectAsState()
     val saturation by viewModel.saturation.collectAsState()
-
+    val contrast by viewModel.contrast.collectAsState()
 
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
@@ -378,8 +370,19 @@ fun EditorView(
                     imageBitmaps[currentBitmapIndex].image,
                     dstOffset = IntOffset.Zero,
                     dstSize = IntSize(viewWidth, viewHeight),
-                    colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply {
+                    colorFilter = ColorFilter.colorMatrix(ColorMatrix(
+                        // Brightness and contrast
+                        floatArrayOf(
+                            contrast, 0f, 0f, 0f, brightness,
+                            0f, contrast, 0f, 0f, brightness,
+                            0f, 0f, contrast, 0f, brightness,
+                            0f, 0f, 0f, 1f, 0f
+                        )
+                    ).apply {
+                        // saturation
                         setToSaturation(saturation)
+                        // just one of them work. if i remove setToSaturation brightness and contrast work fine
+                        // or saturation override and brightness and contrast
                     })
                 )
             }
