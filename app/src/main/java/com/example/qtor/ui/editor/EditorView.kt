@@ -1,8 +1,11 @@
 package com.example.qtor.ui.editor
 
 import android.content.Context
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
@@ -14,6 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -24,6 +28,10 @@ import androidx.core.graphics.drawable.toBitmap
 import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.util.*
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.drawscope.Fill
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -57,6 +65,10 @@ fun EditorView(
     var scaleF by remember {
         mutableStateOf(1f)
     }
+    var moving by remember {
+        mutableStateOf(false)
+    }
+    val screenState by viewModel.stateScreen.collectAsState()
     //Adjust
     val brightness by viewModel.brightness.collectAsState()
     val saturation by viewModel.saturation.collectAsState()
@@ -94,24 +106,27 @@ fun EditorView(
         mutableStateOf(0f)
     }
     var colorFilter = ColorMatrix()
-
-    LaunchedEffect(saturation ){
-        colorFilter.setToSaturation(saturation)
-//        colorFilter.setToScale(brightness,brightness,brightness,1f)
+    var drawX1 by remember {
+        mutableStateOf(0f)
     }
-    LaunchedEffect(brightness ){
-//        colorFilter.setToSaturation(saturation)
+    var drawY1 by remember {
+        mutableStateOf(0f)
+    }
+    LaunchedEffect(Pair(drawX, drawY)) {
+        drawX1 = drawX
+        drawY1 = drawY
 //        colorFilter.setToScale(brightness,brightness,brightness,1f)
     }
     val filter by viewModel.filter.collectAsState()
     fun moveImage() {
 
     }
+
     val drawColor = MaterialTheme.colors.primary
 
     fun processScaleAndMoveView(event: MotionEvent): Boolean {
-        drawX += (event.getX(0) - downX)
-        drawY += (event.getY(0) - downY)
+        drawX +=(event.getX(0) - downX)*.8f
+        drawY +=(event.getY(0) - downY)*.8f
         currentDistance = getDistance(event)
         val s = (currentDistance / preDistance)
         if (s in 0.9f..1.1f) {
@@ -132,18 +147,18 @@ fun EditorView(
                 return when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         if (event.pointerCount == 1) {
-                            downX = event.x
-                            downY = event.y
+                            downX = event.x/scaleF
+                            downY = event.y/scaleF
                             path?.moveTo(downX, downY)
-                        }else{
-                            preDistance= getDistance(event)
+                        } else {
+                            preDistance = getDistance(event)
                         }
                         true
                     }
                     MotionEvent.ACTION_MOVE -> {
                         if (event.pointerCount == 1) {
-                            downX = event.x
-                            downY = event.y
+                            downX = event.x/scaleF
+                            downY = event.y/scaleF
                             path?.lineTo(downX, downY)
                             val temp = path
                             path = null
@@ -203,6 +218,39 @@ fun EditorView(
         }
     }
 
+    fun processActionToolText(event: MotionEvent): Boolean {
+        return when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                if (event.pointerCount == 1) {
+                    downX = event.x
+                    downY = event.y
+                }
+                else{
+
+                }
+                true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                if (event.pointerCount == 1) {
+//                    moving=true
+                    drawX += (event.x - downX)
+                    drawY += (event.y - downY)
+                    downX = event.x
+                    downY = event.y
+                }
+                true
+            }
+            MotionEvent.ACTION_UP -> {
+                moving = false
+                true
+            }
+            else -> {
+                true
+            }
+        }
+    }
+
+
     fun processActionToolStickers(event: MotionEvent): Boolean {
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -210,12 +258,15 @@ fun EditorView(
                 } else if (event.pointerCount == 1) {
                     downX = event.x
                     downY = event.y
+                    Log.d("DOWNX",downX.toString())
+                    Log.d("DOWNY",downY.toString())
                     if (itemActive != -1) {
                         var found = false
                         val currentItem = stickers[itemActive]
+                        Log.d("currentItem","L ${currentItem.rect.left}  T ${currentItem.rect.top} R ${currentItem.rect.right} B ${currentItem.rect.bottom} ")
                         if (isInsideRotatedRect(
-                                downX,
-                                downY,
+                                downX/scaleF,
+                                 downY/scaleF,
                                 currentItem.rect.centerX(),
                                 currentItem.rect.centerY(),
                                 rectDelete,
@@ -225,8 +276,8 @@ fun EditorView(
                             viewModel.removeSticker()
                         }
                         if (isInsideRotatedRect(
-                                downX,
-                                downY,
+                                downX/scaleF,
+                                downY/scaleF,
                                 currentItem.rect.centerX(),
                                 currentItem.rect.centerY(),
                                 rectCopy,
@@ -236,8 +287,8 @@ fun EditorView(
                             viewModel.addSticker(stickers[itemActive])
                         }
                         if (isInsideRotatedRect(
-                                downX,
-                                downY,
+                                downX/scaleF,
+                                downY/scaleF,
                                 currentItem.rect.centerX(),
                                 currentItem.rect.centerY(),
                                 rectFlip,
@@ -248,8 +299,8 @@ fun EditorView(
                             viewModel.flipItemActiveHorizontally()
                         }
                         if (isInsideRotatedRect(
-                                downX,
-                                downY,
+                                downX/scaleF,
+                                downY/scaleF,
                                 currentItem.rect.centerX(),
                                 currentItem.rect.centerY(),
                                 rectScale,
@@ -266,8 +317,8 @@ fun EditorView(
                     for (i in stickers.indices) {
                         val currentItem = stickers[i]
                         if (isInsideRotatedRect(
-                                downX,
-                                downY,
+                                downX/scaleF,
+                                downY/scaleF,
                                 currentItem.rect.centerX(),
                                 currentItem.rect.centerY(),
                                 currentItem.rect,
@@ -316,13 +367,13 @@ fun EditorView(
         .height(with(LocalDensity.current) { viewHeight.toDp() })
 //        .scale(scaleF)
         .graphicsLayer {
-            this.translationX=drawX
-            this.translationY=drawY
-            this.scaleX=scaleF
-            this.scaleY=scaleF
+            this.translationX = drawX1
+            this.translationY = drawY1
+            this.scaleX = scaleF
+            this.scaleY = scaleF
         }
         .drawBehind {
-            if (imageBitmaps.isNotEmpty()){
+            if (imageBitmaps.isNotEmpty()) {
                 drawImage(
                     imageBitmaps[currentBitmapIndex].image,
                     dstOffset = IntOffset.Zero,
@@ -342,12 +393,17 @@ fun EditorView(
                 MAIN_TOOL_STICKERS -> {
                     processActionToolStickers(event)
                 }
-
+                MAIN_TOOL_TEXT -> {
+                    processActionToolStickers(event)
+                }
                 else -> {
                     true
                 }
             }
-        }) {
+        }
+
+    ) {
+
         if (mainToolActive != MAIN_TOOl_REMOVE_OBJECT) {
             for (i in stickers.indices) {
                 rotate(
@@ -408,12 +464,14 @@ fun EditorView(
             MAIN_TOOl_REMOVE_OBJECT -> {
                 when (removeObjectToolActive) {
                     DETECT_OBJECT_MODE -> {
-                        for (obj in imageBitmaps[currentBitmapIndex].AIObj) {
-                            drawRect(
-                                Color.Green, obj.box.offset(), obj.box.Size(), style = Stroke(
-                                    width = 5f
+                        if (imageBitmaps.isNotEmpty()){
+                            for (obj in imageBitmaps[currentBitmapIndex].AIObj) {
+                                drawRect(
+                                    Color.Green, obj.box.offset(), obj.box.Size(), style = Stroke(
+                                        width = 5f
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
@@ -424,14 +482,23 @@ fun EditorView(
                                 floatArrayOf(10f, 10f),
                                 0f
                             ),
-                            width = if (removeObjectToolActive == BRUSH_MODE) 10.dp.toPx() else 2.dp.toPx()
-                        ), alpha = .6f
+                            width = if (removeObjectToolActive == BRUSH_MODE) 10.dp.toPx() else 2.dp.toPx(),
+                            cap = StrokeCap.Round
+                        )
+                        , alpha = .6f
                     )
+                    if (removeObjectToolActive == LASSO_MODE && screenState== LOADING){
+                        drawPath(
+                            it, drawColor, style = Fill
+                            , alpha = .6f
+                        )
+                    }
                 }
             }
             else -> {
             }
         }
+
     }
 
 }

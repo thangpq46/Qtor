@@ -37,6 +37,7 @@ const val TYPE_PEOPLE = 0
 const val TYPE_OTHERS = 1
 const val MAIN_TOOl_REMOVE_OBJECT = 1
 const val MAIN_TOOL_STICKERS = 6
+const val MAIN_TOOL_TEXT = 7
 const val IMG_QUALITY = 100
 const val IMAGE_FILE = "image_file"
 const val MASK_FILE = "mask_file"

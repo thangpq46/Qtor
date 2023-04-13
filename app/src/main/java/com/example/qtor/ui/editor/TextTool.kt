@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +24,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.qtor.R
 
 
@@ -52,7 +49,8 @@ fun TextTool(viewModel: EditorViewModel) {
                 text = stringResource(id = R.string.text_place_holder),
                 fontFamily = userTextFont?.let { fontFamily(fontName = it) },
                 textAlign = TextAlign.Center,
-                color = textColor
+                color = textColor,
+                modifier = Modifier.fillMaxWidth()
             )
         }, onValueChange = {
             text = it
@@ -104,7 +102,7 @@ fun TextTool(viewModel: EditorViewModel) {
                 Text(
                     modifier = Modifier
                         .width(150.dp)
-                        .height(60.dp)
+                        .height(50.dp)
                         .wrapContentHeight(Alignment.CenterVertically)
                         .clickable {
                             userTextFont = it.fontName

@@ -302,7 +302,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         _stickers.addAll(a)
     }
 
-    private val _removeObjectToolActive = MutableStateFlow(DETECT_OBJECT_MODE)
+    private val _removeObjectToolActive = MutableStateFlow(BRUSH_MODE)
     val removeObjectToolActive: StateFlow<Int> = _removeObjectToolActive
     private val _currentRemoveActionIndex = MutableStateFlow(-1)
     val currentRemoveActionIndex: StateFlow<Int> = _currentRemoveActionIndex
@@ -600,5 +600,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             ))
         }
     }
+    private val _drawX = MutableStateFlow(0f)
+    val drawX :StateFlow<Float> = _drawX
+    private val _drawY = MutableStateFlow(0f)
+    val drawY : StateFlow<Float> = _drawY
 
 }
