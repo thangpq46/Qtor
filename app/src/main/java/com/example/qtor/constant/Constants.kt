@@ -6,18 +6,18 @@ import com.example.qtor.data.model.Tool
 const val IMAGE_TO_EDIT = "image_to_edit"
 const val TYPE_ALL_IMAGE = "image/*"
 val LIST_OF_TOOLS = mutableListOf(
-    "Template",
-    "Tools",
-    "Portrait",
-    "Filters",
-    "Adjust",
-    "Effects",
-    "Stickers",
-    "Text",
-    "Time stamp",
-    "Draw shapes",
-    "Add photos",
-    "AI filter"
+    "TEMPLATE",
+    "TOOLS",
+    "PORTRAIT",
+    "FILTERS",
+    "ADJUST",
+    "EFFECTS",
+    "STICKERS",
+    "TEXT",
+    "TIMESTAMP",
+    "DRAW SHAPE",
+    "ADD PHOTOS",
+    "AI FILTER"
 )
 const val EDIT_IMAGE_TOOl = 1
 const val STICKER_TOOL = 6

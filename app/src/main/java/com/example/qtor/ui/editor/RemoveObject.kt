@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -119,8 +120,9 @@ fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
         onClick()
     }) {
         Text(text = tool, modifier = Modifier
-            .width(70.dp)
-            , fontSize = 16.sp, color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant
+            .wrapContentWidth(),
+            fontWeight = FontWeight.SemiBold
+            , fontSize = 13.sp, color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant
         )
     }
 }
