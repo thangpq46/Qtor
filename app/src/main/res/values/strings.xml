@@ -24,4 +24,8 @@
     <string name="adjust_warmth">Warmth</string>
     <string name="adjust_Tint">Tint</string>
     <string name="text_place_holder">Please Type Here…</string>
+    <string name="discard_change">Discard Change</string>
+    <string name="alert_discard_change">Are You sure want to discard changes and Exit!</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
 </resources>
