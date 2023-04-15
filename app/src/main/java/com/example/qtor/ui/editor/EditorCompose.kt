@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -59,7 +61,6 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
             Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Toolbar(Modifier.weight(1f), title = context.getString(R.string.title_editor))
             if (state == LOADING) {
                 ProgressBar()
             }
@@ -105,7 +106,7 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
 
 
 @Composable
-fun CustomDialogUI(modifier: Modifier = Modifier) {
+fun CustomDialogUI(modifier: Modifier = Modifier,onCancel:()->Unit,onConfirm:()->Unit) {
     Card(
         //shape = MaterialTheme.shapes.medium,
         shape = RoundedCornerShape(10.dp),
@@ -163,7 +164,7 @@ fun CustomDialogUI(modifier: Modifier = Modifier) {
             ) {
 
                 TextButton(onClick = {
-//                    openDialogCustom.value = false
+                    onCancel()
                 }) {
 
                     Text(
@@ -174,7 +175,7 @@ fun CustomDialogUI(modifier: Modifier = Modifier) {
                     )
                 }
                 TextButton(onClick = {
-//                    openDialogCustom.value = false
+                    onConfirm()
                 }) {
                     Text(
                         stringResource(id = R.string.confirm),

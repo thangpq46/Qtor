@@ -61,21 +61,21 @@ const val TOOL_INIT_INDEX = "ToolActive"
 const val ADJUST_TOOL = 4
 val ADJUST_LIST_TOOLS = listOf(
     Tool(R.drawable.ic_brightness, R.string.adjust_brightness),
-    Tool(R.drawable.ic_brilliance, R.string.adjust_brilliance),
+    Tool(R.drawable.ic_warp, R.string.adjust_warmth),
     Tool(R.drawable.ic_contrast, R.string.adjust_contrast),
     Tool(R.drawable.ic_saturation, R.string.adjust_saturation),
-    Tool(R.drawable.ic_saturation, R.string.adjust_vibrance),
-    Tool(R.drawable.ic_sharpen, R.string.adjust_sharpen),
-    Tool(R.drawable.ic_grain, R.string.adjust_Grain),
-    Tool(R.drawable.ic_hightlight, R.string.adjust_highlight),
-    Tool(R.drawable.ic_shadow, R.string.adjust_shadow),
-    Tool(R.drawable.ic_fade, R.string.adjust_fade),
-    Tool(R.drawable.ic_warp, R.string.adjust_warmth),
-    Tool(R.drawable.ic_tint, R.string.adjust_Tint)
+//    Tool(R.drawable.ic_saturation, R.string.adjust_vibrance),
+//    Tool(R.drawable.ic_sharpen, R.string.adjust_sharpen),
+//    Tool(R.drawable.ic_grain, R.string.adjust_Grain),
+//    Tool(R.drawable.ic_hightlight, R.string.adjust_highlight),
+//    Tool(R.drawable.ic_shadow, R.string.adjust_shadow),
+//    Tool(R.drawable.ic_fade, R.string.adjust_fade),
+//    Tool(R.drawable.ic_brilliance, R.string.adjust_brilliance),
+//    Tool(R.drawable.ic_tint, R.string.adjust_Tint)
 )
 const val FIFTH_TI = 50
 const val HUREND = 100
 const val ADJUST_BRIGHTNESS=0
-const val ADJUST_BRILLIANCE=1
+const val ADJUST_WARMTH=1
 const val ADJUST_CONTRAST=2
 const val ADJUST_SATURATION=3

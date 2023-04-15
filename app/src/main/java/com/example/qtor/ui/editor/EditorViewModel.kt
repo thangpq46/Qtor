@@ -577,19 +577,25 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _saturation = MutableStateFlow(1f)
     val saturation: StateFlow<Float> = _saturation
     fun setSaturation(process: Float) {
-        _saturation.value = process / 100
+        _saturation.value = process
     }
 
     private val _contrast = MutableStateFlow(1f)
     val contrast: StateFlow<Float> = _contrast
     fun setContrast(process: Float) {
-        _contrast.value = process / HUREND
+        _contrast.value = process
     }
 
+    private val _warmth= MutableStateFlow(1f)
+    val warmth :StateFlow<Float> = _warmth
 
-    fun addText(text:String,fontName: String?,fontSize:Float){
+    fun setWarmth(temp:Float){
+        _warmth.value=temp
+    }
+
+    fun addText(text:String,fontName: String?,fontSize:Float,textColor: Color){
         viewModelScope.launch(Dispatchers.IO) {
-            val bitmap  = createImageBitmapFromText(application,text,fontName)
+            val bitmap  = createImageBitmapFromText(application,text,fontName,textColor)
             val left = _editorWidth.value / 2f - bitmap.width / 2
             val top = _editorHeight.value / 2f - bitmap.height / 2
             val right = left + bitmap.width
@@ -605,4 +611,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _drawY = MutableStateFlow(0f)
     val drawY : StateFlow<Float> = _drawY
 
+    fun saveImage(){
+
+    }
 }

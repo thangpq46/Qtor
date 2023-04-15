@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -38,6 +39,7 @@ fun TextTool(viewModel: EditorViewModel) {
     var textColor by remember {
         mutableStateOf(Color.Black)
     }
+    val focusManager = LocalFocusManager.current
     val fonts = viewModel.fonts
     Row(
         horizontalArrangement = Arrangement.SpaceBetween
@@ -61,7 +63,8 @@ fun TextTool(viewModel: EditorViewModel) {
         ))
         IconButton(modifier = Modifier.weight(1f), onClick = {
             if (text.isNotEmpty()) {
-                viewModel.addText(text, userTextFont, 12f)
+                viewModel.addText(text, userTextFont, 12f,textColor)
+                focusManager.clearFocus()
                 text = ""
             }
         }) {

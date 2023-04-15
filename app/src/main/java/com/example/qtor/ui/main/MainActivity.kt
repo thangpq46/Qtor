@@ -2,8 +2,10 @@ package com.example.qtor.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,12 +64,31 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            startActivity(Intent(
+                this@MainActivity,
+                EditorActivity::class.java
+            ).apply {
+                putExtra(IMAGE_TO_EDIT, uri.toString())
+                toolIndex?.let {
+                    putExtra(TOOL_INIT_INDEX,it)
+                }
+            })
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MainActivityUI {
                 toolIndex=it
-                pickImageToEditor.launch(TYPE_ALL_IMAGE)
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+//                pickImageToEditor.launch(TYPE_ALL_IMAGE)
             }
         }
     }

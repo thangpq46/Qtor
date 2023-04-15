@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -24,7 +25,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.util.*
-import androidx.compose.ui.graphics.drawscope.Fill
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -65,7 +65,7 @@ fun EditorView(
     val brightness by viewModel.brightness.collectAsState()
     val saturation by viewModel.saturation.collectAsState()
     val contrast by viewModel.contrast.collectAsState()
-
+    val warmth by viewModel.warmth.collectAsState()
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
     //icon
@@ -97,12 +97,28 @@ fun EditorView(
     var drawY by remember {
         mutableStateOf(0f)
     }
-    var colorFilter = ColorMatrix()
     var drawX1 by remember {
         mutableStateOf(0f)
     }
     var drawY1 by remember {
         mutableStateOf(0f)
+    }
+    val imageMatrix by remember {
+        mutableStateOf(ImageMatrix())
+    }
+    LaunchedEffect(Pair(brightness, contrast)){
+        imageMatrix.mBrightness=brightness
+        imageMatrix.mContrast=contrast
+        imageMatrix.mSaturation=saturation
+        imageMatrix.mWarmth=warmth
+        imageMatrix.updateMatrix()
+    }
+    LaunchedEffect(Pair(saturation,warmth)){
+        imageMatrix.mBrightness=brightness
+        imageMatrix.mContrast=contrast
+        imageMatrix.mSaturation=saturation
+        imageMatrix.mWarmth=warmth
+        imageMatrix.updateMatrix()
     }
     LaunchedEffect(Pair(drawX, drawY)) {
         drawX1 = drawX
@@ -110,9 +126,6 @@ fun EditorView(
 //        colorFilter.setToScale(brightness,brightness,brightness,1f)
     }
     val filter by viewModel.filter.collectAsState()
-    fun moveImage() {
-
-    }
 
     val drawColor = MaterialTheme.colors.primary
 
@@ -370,20 +383,7 @@ fun EditorView(
                     imageBitmaps[currentBitmapIndex].image,
                     dstOffset = IntOffset.Zero,
                     dstSize = IntSize(viewWidth, viewHeight),
-                    colorFilter = ColorFilter.colorMatrix(ColorMatrix(
-                        // Brightness and contrast
-                        floatArrayOf(
-                            contrast, 0f, 0f, 0f, brightness,
-                            0f, contrast, 0f, 0f, brightness,
-                            0f, 0f, contrast, 0f, brightness,
-                            0f, 0f, 0f, 1f, 0f
-                        )
-                    ).apply {
-                        // saturation
-                        setToSaturation(saturation)
-                        // just one of them work. if i remove setToSaturation brightness and contrast work fine
-                        // or saturation override and brightness and contrast
-                    })
+                    colorFilter = ColorFilter.colorMatrix(ColorMatrix(imageMatrix.mColorMatrix.array))
                 )
             }
         }

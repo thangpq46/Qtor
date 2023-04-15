@@ -7,18 +7,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
@@ -116,9 +117,11 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
 
 @Composable
 fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.height(50.dp).clickable {
-        onClick()
-    }) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier
+        .height(50.dp)
+        .clickable {
+            onClick()
+        }) {
         Text(text = tool, modifier = Modifier
             .wrapContentWidth(),
             fontWeight = FontWeight.SemiBold
@@ -129,15 +132,6 @@ fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
 
 @Composable
 fun Toolbar(modifier: Modifier, title: String) {
-    Column {
-        TopAppBar(
-            title = {
-                Text(text = title, color = MaterialTheme.colors.primary)
-            },
-            backgroundColor = MaterialTheme.colors.surface,
-            elevation = 4.dp
-        )
-    }
 
 }
 

@@ -30,22 +30,22 @@ fun adjustTools(viewModel: EditorViewModel) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         when(toolActive){
             ADJUST_BRIGHTNESS->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = -255f..255f, initValue = 0f, step = 510, onValueChange ={
+                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, initValue = 1f, step = 101, onValueChange ={
                     viewModel.setBrightness(it)
                 } )
             }
-            ADJUST_BRILLIANCE->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = 1f..100f, initValue = 50f, step = 100, onValueChange ={
-                    viewModel.setBrilliance(it)
+            ADJUST_WARMTH->{
+                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..2f, initValue = 1f, step = 151, onValueChange ={
+                    viewModel.setWarmth(it)
                 } )
             }
             ADJUST_CONTRAST->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = 0f..10f, initValue = 1f, step = 1, onValueChange ={
+                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, initValue = 1f, step = 101, onValueChange ={
                     viewModel.setContrast(it)
                 } )
             }
             ADJUST_SATURATION->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = 0f..200f, initValue = 100f, step = 200, onValueChange ={
+                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = 0f..2f, initValue = 1f, step = 201, onValueChange ={
                     viewModel.setSaturation(it)
                 } )
             }
@@ -76,7 +76,7 @@ fun SeekBar(modifier: Modifier,valueRange: ClosedFloatingPointRange<Float>,initV
             steps = step
         )
         Text(
-            text = sliderPosition.toInt().toString(),
+            text = sliderPosition.toString(),
             modifier = Modifier.fillMaxWidth()
         )
     }
