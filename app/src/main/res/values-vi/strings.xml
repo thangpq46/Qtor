@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="text_demo_font">ABCDEFGH</string>
+    <string name="tool_template">Mẫu</string>
+    <string name="tool_remove_object">Xóa</string>
+    <string name="tool_portrait">Chân Dung</string>
+    <string name="tool_filters">Bộ Lọc</string>
+    <string name="tool_Adjust">Điều Chỉnh</string>
+    <string name="tool_effects">Hiệu Ứng</string>
+    <string name="tool_stickers">Nhãn Dán</string>
+    <string name="tool_text">Chữ</string>
+    <string name="adjust_brightness">Độ Sáng</string>
+    <string name="adjust_brilliance">Brilliance</string>
+    <string name="adjust_saturation">Độ Bão Hòa</string>
+    <string name="adjust_contrast">Tương Phản</string>
+    <string name="adjust_warmth">Độ Ấm</string>
+    <string name="text_place_holder">Nhập vào đây…</string>
+    <string name="discard_change">Hủy Bỏ</string>
+    <string name="alert_discard_change">Bạn có chắc muốn từ bỏ các thay đổi và thoát!</string>
+    <string name="cancel">Hủy Bỏ</string>
+    <string name="confirm">Xác Nhận</string>
+    <string name="share_image">Chia sẻ ảnh</string>
+    <string name="start_edit">BẮT ĐẦU CHỈNH SỬA</string>
+    <string name="settings">Cài Đặt</string>
+    <string name="ads">Quảng Cáo</string>
+    <string name="instagram">Instagram</string>
+    <string name="facebook">Facebook</string>
+    <string name="tiktok">Tik Tok</string>
+    <string name="sns_channel">Mạng Xã Hội</string>
+    <string name="support">Hỗ Trợ</string>
+    <string name="contact">Liên Hệ</string>
+    <string name="rating">Đánh Giá &amp; Bình Luận</string>
+    <string name="other">Khác</string>
+    <string name="app_info">Thông tin ứng dụng</string>
+</resources>

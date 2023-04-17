@@ -1,5 +1,6 @@
 package com.example.qtor.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.ui.editor.EditorActivity
+import com.example.qtor.ui.setting.SettingActivity
 import com.example.qtor.ui.theme.QTorTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainActivityUI {
+            MainActivityUI(this) {
                 toolIndex = it
                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             }
@@ -74,7 +76,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MainActivityUI(onClick: (Int?) -> Unit) {
+fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
     QTorTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -142,28 +144,12 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
                 }
             }
             Column {
-                var showMenu by remember { mutableStateOf(false) }
-                TopAppBar (title = {}, backgroundColor = Color.Transparent, elevation = 0.dp, actions = {
-                    IconButton(onClick = { showMenu = !showMenu }) {
-                        Icon(Icons.Default.Settings,null, tint = MaterialTheme.colors.primary)
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(onClick = { /*TODO*/ }) {
-                            Row {
-                                Text(text = stringResource(id = R.string.start_edit))
-                                Icon(Icons.Filled.Refresh,null)
-                            }
-                        }
-                        DropdownMenuItem(onClick = { /*TODO*/ }) {
-                            Row {
-                                Text(text = stringResource(id = R.string.start_edit))
-                                Icon(Icons.Filled.Call,null)
-                            }
 
-                        }
+                TopAppBar (title = {}, backgroundColor = Color.Transparent, elevation = 0.dp, actions = {
+                    IconButton(onClick = {
+                        context.startActivity(Intent(context,SettingActivity::class.java))
+                    }) {
+                        Icon(Icons.Default.Settings,null, tint = MaterialTheme.colors.primary)
                     }
                 })
             }

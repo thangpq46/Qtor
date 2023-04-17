@@ -77,11 +77,11 @@ val ADJUST_LIST_TOOLS = listOf(
 )
 const val FIFTH_TI = 50
 const val HUREND = 100
-const val ADJUST_BRIGHTNESS=0
-const val ADJUST_WARMTH=1
-const val ADJUST_CONTRAST=2
-const val ADJUST_SATURATION=3
-const val URI_SAVED_IMAGE="uri"
+const val ADJUST_BRIGHTNESS = 0
+const val ADJUST_WARMTH = 1
+const val ADJUST_CONTRAST = 2
+const val ADJUST_SATURATION = 3
+const val URI_SAVED_IMAGE = "uri"
 val tools = listOf(
     Tool(R.drawable.ic_template, R.string.tool_template),
     Tool(R.drawable.ic_remove_object, R.string.tool_remove_object),
@@ -100,3 +100,11 @@ val images = listOf(
     R.drawable.demo5,
     R.drawable.demo6,
 )
+const val OWNER_FACEBOOK = "https://www.facebook.com/quangthang46/"
+const val OWNER_INSTAGRAM = "https://www.instagram.com/pqt46/"
+const val OWNER_TIKTOK = "https://www.tiktok.com/@qthang46"
+const val OWNER_GMAIL="pqt4621@gmail.com"
+const val MAIL_TO="mailto:"
+const val MAIL_SUBJECT="QTOR Support"
+const val INTENT_TITLE="Send email"
+const val DEFAULT_MESSAGE_VALUE="   "
