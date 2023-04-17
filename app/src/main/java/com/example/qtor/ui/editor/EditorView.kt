@@ -97,12 +97,6 @@ fun EditorView(
     var drawY by remember {
         mutableStateOf(0f)
     }
-    var drawX1 by remember {
-        mutableStateOf(0f)
-    }
-    var drawY1 by remember {
-        mutableStateOf(0f)
-    }
     val imageMatrix by remember {
         mutableStateOf(ImageMatrix())
     }
@@ -119,11 +113,6 @@ fun EditorView(
         imageMatrix.mSaturation=saturation
         imageMatrix.mWarmth=warmth
         imageMatrix.updateMatrix()
-    }
-    LaunchedEffect(Pair(drawX, drawY)) {
-        drawX1 = drawX
-        drawY1 = drawY
-//        colorFilter.setToScale(brightness,brightness,brightness,1f)
     }
     val filter by viewModel.filter.collectAsState()
 
@@ -372,13 +361,16 @@ fun EditorView(
         .height(with(LocalDensity.current) { viewHeight.toDp() })
 //        .scale(scaleF)
         .graphicsLayer {
-            this.translationX = drawX1
-            this.translationY = drawY1
+            this.translationX = drawX
+            this.translationY = drawY
             this.scaleX = scaleF
             this.scaleY = scaleF
         }
         .drawBehind {
             if (imageBitmaps.isNotEmpty()) {
+                for (i in imageMatrix.mColorMatrix.array){
+                    Log.d("AAA",i.toString())
+                }
                 drawImage(
                     imageBitmaps[currentBitmapIndex].image,
                     dstOffset = IntOffset.Zero,

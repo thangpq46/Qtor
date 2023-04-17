@@ -1,7 +1,9 @@
 package com.example.qtor.ui.editor
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
@@ -25,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.utils.widget.ImageFilterView
 import com.example.qtor.R
 import com.example.qtor.constant.IMAGE_TO_EDIT
 import com.example.qtor.constant.TOOL_INIT_INDEX
+import com.example.qtor.constant.URI_SAVED_IMAGE
 import com.example.qtor.ui.editor.ui.theme.QTorTheme
+import com.example.qtor.ui.share.ShareImageActivity
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.opencv.android.OpenCVLoader
 
 class EditorActivity : ComponentActivity() {
@@ -43,6 +47,7 @@ class EditorActivity : ComponentActivity() {
         intent.getIntExtra(TOOL_INIT_INDEX,0).let {
             viewModel.setMainToolActive(it)
         }
+        viewModel.setBrightness(1.001f)
         setContent {
             QTorTheme {
                 var showDialog by remember {
@@ -68,7 +73,19 @@ class EditorActivity : ComponentActivity() {
                         },
                         elevation = 0.dp,
                         actions = {
-                            IconButton(onClick = { viewModel.saveImage() }) {
+                            IconButton(onClick = {
+                                viewModel.saveImage(
+                                    onSuccess = {
+                                        Toast.makeText(this@EditorActivity, it.toString(),Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this@EditorActivity,ShareImageActivity::class.java).apply {
+                                            putExtra(URI_SAVED_IMAGE,it.toString())
+                                        })
+                                    },
+                                    onFailed = {
+                                        Toast.makeText(this@EditorActivity,"F",Toast.LENGTH_SHORT).show()
+                                    }
+                                )
+                            }) {
                                 Icon(
                                     painterResource(id = R.drawable.ic_download),
                                     contentDescription = "DownLoad",

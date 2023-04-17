@@ -28,4 +28,7 @@
     <string name="alert_discard_change">Are You sure want to discard changes and Exit!</string>
     <string name="cancel">Cancel</string>
     <string name="confirm">Confirm</string>
+    <string name="title_activity_share_image">ShareImageActivity</string>
+    <string name="share_image">Share Image</string>
+    <string name="start_edit">START EDITING</string>
 </resources>

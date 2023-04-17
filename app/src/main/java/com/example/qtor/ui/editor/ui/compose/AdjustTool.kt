@@ -27,25 +27,37 @@ fun adjustTools(viewModel: EditorViewModel) {
     var toolActive by remember {
         mutableStateOf(0)
     }
+    val brightness by viewModel.brightness.collectAsState()
+    val contrast by viewModel.contrast.collectAsState()
+    val saturation by viewModel.saturation.collectAsState()
+    val warmth by viewModel.warmth.collectAsState()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         when(toolActive){
             ADJUST_BRIGHTNESS->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, initValue = 1f, step = 101, onValueChange ={
+                SeekBar(modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, value = brightness, step = 101, onValueChange ={
                     viewModel.setBrightness(it)
                 } )
             }
             ADJUST_WARMTH->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..2f, initValue = 1f, step = 151, onValueChange ={
+                SeekBar(modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally),valueRange = .5f..2f, value = warmth, step = 151, onValueChange ={
                     viewModel.setWarmth(it)
                 } )
             }
             ADJUST_CONTRAST->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, initValue = 1f, step = 101, onValueChange ={
+                SeekBar(modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally),valueRange = .5f..1.5f, value = contrast, step = 101, onValueChange ={
                     viewModel.setContrast(it)
                 } )
             }
             ADJUST_SATURATION->{
-                SeekBar(modifier = Modifier.fillMaxWidth(0.7f).align(Alignment.CenterHorizontally),valueRange = 0f..2f, initValue = 1f, step = 201, onValueChange ={
+                SeekBar(modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .align(Alignment.CenterHorizontally),valueRange = 0f..2f, value = saturation, step = 201, onValueChange ={
                     viewModel.setSaturation(it)
                 } )
             }
@@ -64,21 +76,22 @@ fun adjustTools(viewModel: EditorViewModel) {
 }
 
 @Composable
-fun SeekBar(modifier: Modifier,valueRange: ClosedFloatingPointRange<Float>,initValue:Float,step:Int,onValueChange:(Float)->Unit) {
-    var sliderPosition by remember { mutableStateOf(initValue) }
+fun SeekBar(modifier: Modifier, valueRange: ClosedFloatingPointRange<Float>, value:Float, step:Int, onValueChange:(Float)->Unit) {
+//    var sliderPosition by remember { mutableStateOf(value) }
     Column {
         Slider(modifier=modifier,
-            value = sliderPosition,
-            onValueChange = { sliderPosition = it
+            value = value,
+            onValueChange = {
+//                sliderPosition = it
                             onValueChange(it)
                             },
             valueRange = valueRange,
             steps = step
         )
-        Text(
-            text = sliderPosition.toString(),
-            modifier = Modifier.fillMaxWidth()
-        )
+//        Text(
+//            text = sliderPosition.toString(),
+//            modifier = Modifier.fillMaxWidth()
+//        )
     }
 }
 

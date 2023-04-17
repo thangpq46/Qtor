@@ -1,26 +1,22 @@
 package com.example.qtor.ui.editor
 
 import android.app.Application
+import android.content.ContentValues
 import android.graphics.*
 import android.graphics.Matrix
 
 import android.net.Uri
-import android.util.Log
+import android.os.Build
+import android.provider.MediaStore
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.*
 import com.example.qtor.data.repository.DataSource
-import com.example.qtor.data.repository.ImageRepository
-import com.example.qtor.data.repository.LocalDataSource
-import com.example.qtor.data.repository.RemoteDataSource
 import com.example.qtor.ui.base.BaseViewModel
 import com.example.qtor.util.*
 import com.google.mlkit.common.model.LocalModel
@@ -34,16 +30,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
-import androidx.compose.ui.text.font.FontFamily
-
-//    import android.graphics.Color
-//    import android.graphics.Typeface
-//    import androidx.compose.ui.graphics.ColorFilter
-//    import androidx.compose.ui.graphics.ColorMatrix
-//    import androidx.compose.ui.graphics.ColorMatrixFilter
-//    import androidx.compose.ui.graphics.ImageBitmap
-//    import androidx.compose.ui.graphics.asImageBitmap
-
+import java.io.IOException
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
     //    private val repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
@@ -606,12 +593,46 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             ))
         }
     }
-    private val _drawX = MutableStateFlow(0f)
-    val drawX :StateFlow<Float> = _drawX
-    private val _drawY = MutableStateFlow(0f)
-    val drawY : StateFlow<Float> = _drawY
 
-    fun saveImage(){
+    fun saveImage(onSuccess:(Uri)->Unit,onFailed:()->Unit){
+        viewModelScope.launch {
+            _stateScreen.value= LOADING
+            val image = imageBitmaps[_currentBitmapIndex.value].image.asAndroidBitmap()
+            val name = "aaa.jpg"
+            val imageCollection: Uri = if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.Q){
+                MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            }else{
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            }
+            val content = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME,name)
+                put(MediaStore.Images.Media.MIME_TYPE,"image/jpeg")
+                put(MediaStore.Images.Media.WIDTH,image.width)
+                put(MediaStore.Images.Media.HEIGHT,image.height)
+            }
+             try {
+                application.contentResolver.insert(imageCollection,content)?.also {
+                    application.contentResolver.openOutputStream(it).use { os->
+                        if (!image.compress(Bitmap.CompressFormat.JPEG,100,os)){
+                            throw IOException("Failed to save BMP")
+                        }else{
+                            viewModelScope.launch(Dispatchers.Main) {
+                                onSuccess(it)
+                            }
+                        }
+                    }
+                } ?: throw IOException("Failed to Create Media Entry")
+                 _stateScreen.value= INDILE
 
+            }catch (
+                e: IOException
+            ){
+                e.printStackTrace()
+                 _stateScreen.value= INDILE
+                viewModelScope.launch(Dispatchers.Main) {
+                    onFailed()
+                }
+            }
+        }
     }
 }

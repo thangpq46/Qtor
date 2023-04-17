@@ -17,40 +17,35 @@ import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
-import com.example.qtor.constant.IMAGE_TO_EDIT
-import com.example.qtor.constant.ONE_SECOND
-import com.example.qtor.constant.TOOL_INIT_INDEX
-import com.example.qtor.constant.TYPE_ALL_IMAGE
-import com.example.qtor.data.model.Tool
+import com.example.qtor.constant.*
 import com.example.qtor.ui.editor.EditorActivity
 import com.example.qtor.ui.theme.QTorTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.delay
-import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
 
-    var toolIndex: Int? = null
-    private val pickImageToEditor =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    private var toolIndex: Int? = null
+
+    private val pickMedia =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 startActivity(Intent(
                     this@MainActivity,
@@ -58,37 +53,20 @@ class MainActivity : ComponentActivity() {
                 ).apply {
                     putExtra(IMAGE_TO_EDIT, uri.toString())
                     toolIndex?.let {
-                        putExtra(TOOL_INIT_INDEX,it)
+                        putExtra(TOOL_INIT_INDEX, it)
                     }
                 })
+            } else {
+                Log.d("PhotoPicker", "No media selected")
             }
         }
-
-    val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            startActivity(Intent(
-                this@MainActivity,
-                EditorActivity::class.java
-            ).apply {
-                putExtra(IMAGE_TO_EDIT, uri.toString())
-                toolIndex?.let {
-                    putExtra(TOOL_INIT_INDEX,it)
-                }
-            })
-        } else {
-            Log.d("PhotoPicker", "No media selected")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MainActivityUI {
-                toolIndex=it
+                toolIndex = it
                 pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-//                pickImageToEditor.launch(TYPE_ALL_IMAGE)
             }
         }
     }
@@ -100,25 +78,6 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
     QTorTheme {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-                val images = listOf(
-                    ImageBitmap.imageResource(R.drawable.demo1),
-                    ImageBitmap.imageResource(R.drawable.demo2),
-                    ImageBitmap.imageResource(R.drawable.demo3),
-                    ImageBitmap.imageResource(R.drawable.demo4),
-                    ImageBitmap.imageResource(R.drawable.demo5),
-                    ImageBitmap.imageResource(R.drawable.demo6),
-                )
-                val tools = listOf(
-                    Tool(R.drawable.ic_template, R.string.tool_template),
-                    Tool(R.drawable.ic_remove_object, R.string.tool_remove_object),
-                    Tool(R.drawable.ic_portrait, R.string.tool_portrait),
-                    Tool(R.drawable.ic_filter, R.string.tool_filters),
-                    Tool(R.drawable.ic_adjust, R.string.tool_Adjust),
-                    Tool(R.drawable.ic_effects, R.string.tool_effects),
-                    Tool(R.drawable.ic_template, R.string.tool_stickers),
-                    Tool(R.drawable.ic_remove_object, R.string.tool_text)
-                )
                 Card(
                     modifier = Modifier,
                     shape = RoundedCornerShape(5.dp),
@@ -127,10 +86,12 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
                         itemsCount = images.size,
                         itemContent = { index ->
                             Image(
-                                images[index],
+                                painterResource(id = images[index]),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier.height(screenHeight / 2)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(.5f)
                             )
                         }
                     )
@@ -143,7 +104,7 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
                         .padding(vertical = 10.dp)
                         .height(LocalConfiguration.current.screenHeightDp.dp * 3 / 10f)
                 ) {
-                    itemsIndexed(tools) {index, tool ->
+                    itemsIndexed(tools) { index, tool ->
                         // Replace this with your item composable
                         Surface(modifier = Modifier
                             .padding(vertical = 15.dp)
@@ -172,7 +133,7 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
                 }
                 Button(onClick = { onClick(null) }) {
                     Text(
-                        text = "START EDITING",
+                        text = stringResource(id = R.string.start_edit),
                         modifier = Modifier
                             .fillMaxWidth(.8f),
                         textAlign = TextAlign.Center,
@@ -180,6 +141,33 @@ fun MainActivityUI(onClick: (Int?) -> Unit) {
                     )
                 }
             }
+            Column {
+                var showMenu by remember { mutableStateOf(false) }
+                TopAppBar (title = {}, backgroundColor = Color.Transparent, elevation = 0.dp, actions = {
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(Icons.Default.Settings,null, tint = MaterialTheme.colors.primary)
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(onClick = { /*TODO*/ }) {
+                            Row {
+                                Text(text = stringResource(id = R.string.start_edit))
+                                Icon(Icons.Filled.Refresh,null)
+                            }
+                        }
+                        DropdownMenuItem(onClick = { /*TODO*/ }) {
+                            Row {
+                                Text(text = stringResource(id = R.string.start_edit))
+                                Icon(Icons.Filled.Call,null)
+                            }
+
+                        }
+                    }
+                })
+            }
+
         }
     }
 }

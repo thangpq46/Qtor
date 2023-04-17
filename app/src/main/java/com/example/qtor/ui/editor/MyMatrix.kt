@@ -11,6 +11,9 @@ internal class ImageMatrix {
     var mSaturation = 1f
     var mContrast = 1f
     var mWarmth = 1f
+    init {
+        updateMatrix()
+    }
     private fun saturation(saturationStrength: Float) {
         val Rf = 0.2999f
         val Gf = 0.587f
@@ -41,8 +44,8 @@ internal class ImageMatrix {
         m[19] = 0f
     }
 
-    private fun warmth(warmth: Float) {
-        var warmth = warmth
+    private fun warmth(warmtha: Float) {
+        var warmth = warmtha
         val baseTemperature = 5000f
         if (warmth <= 0) warmth = .01f
         var tmpColor_r: Float

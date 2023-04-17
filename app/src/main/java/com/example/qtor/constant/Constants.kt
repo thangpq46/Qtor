@@ -1,5 +1,7 @@
 package com.example.qtor.constant
 
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.res.imageResource
 import com.example.qtor.R
 import com.example.qtor.data.model.Tool
 
@@ -79,3 +81,22 @@ const val ADJUST_BRIGHTNESS=0
 const val ADJUST_WARMTH=1
 const val ADJUST_CONTRAST=2
 const val ADJUST_SATURATION=3
+const val URI_SAVED_IMAGE="uri"
+val tools = listOf(
+    Tool(R.drawable.ic_template, R.string.tool_template),
+    Tool(R.drawable.ic_remove_object, R.string.tool_remove_object),
+    Tool(R.drawable.ic_portrait, R.string.tool_portrait),
+    Tool(R.drawable.ic_filter, R.string.tool_filters),
+    Tool(R.drawable.ic_adjust, R.string.tool_Adjust),
+    Tool(R.drawable.ic_effects, R.string.tool_effects),
+    Tool(R.drawable.ic_template, R.string.tool_stickers),
+    Tool(R.drawable.ic_remove_object, R.string.tool_text)
+)
+val images = listOf(
+    R.drawable.demo1,
+    R.drawable.demo2,
+    R.drawable.demo3,
+    R.drawable.demo4,
+    R.drawable.demo5,
+    R.drawable.demo6,
+)
