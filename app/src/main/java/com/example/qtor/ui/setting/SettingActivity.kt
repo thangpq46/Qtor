@@ -7,24 +7,23 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.qtor.ui.setting.ui.theme.QTorTheme
 import com.example.qtor.R
 import com.example.qtor.constant.*
+import com.example.qtor.ui.setting.ui.theme.QTorTheme
 
 class SettingActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,15 +72,15 @@ class SettingActivity : ComponentActivity() {
                                 }
                             }
                         }
-                        Image(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(.15f),
-                            painter = painterResource(id = R.drawable.ic_download),
-                            contentDescription = stringResource(
-                                id = R.string.ads
-                            )
-                        )
+//                        Image(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .fillMaxHeight(.15f),
+//                            painter = painterResource(id = R.drawable.ic_download),
+//                            contentDescription = stringResource(
+//                                id = R.string.ads
+//                            )
+//                        )
                         SectionSetting(stringResource(id = R.string.sns_channel)){
                             SectionItem(title = stringResource(id = R.string.instagram), icon = R.drawable.ic_insta) {
                                 startActivity(Intent(Intent.ACTION_VIEW).apply {
@@ -120,92 +119,6 @@ class SettingActivity : ComponentActivity() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    QTorTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background
-        ) {
-            Column {
-                TopAppBar {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CompositionLocalProvider(
-                            LocalContentAlpha provides ContentAlpha.high,
-                        ) {
-                            IconButton(
-                                onClick = { },
-                                enabled = true,
-                            ) {
-                                Icon(
-                                    Icons.Default.ArrowBack,
-                                    contentDescription = "Back",
-                                )
-
-                            }
-                        }
-                    }
-
-                    Row(
-                        Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                            CompositionLocalProvider(
-                                LocalContentAlpha provides ContentAlpha.high,
-                            ) {
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 1,
-                                    text = stringResource(id = R.string.settings)
-                                )
-                            }
-                        }
-                    }
-                }
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(.15f),
-                    painter = painterResource(id = R.drawable.ic_download),
-                    contentDescription = stringResource(
-                        id = R.string.ads
-                    )
-                )
-                SectionSetting(stringResource(id = R.string.sns_channel)){
-                    SectionItem(title = stringResource(id = R.string.instagram), icon = R.drawable.ic_tiktok
-                    ) {
-
-                    }
-                    SectionItem(title = stringResource(id = R.string.tiktok), icon = R.drawable.ic_fb) {
-
-                    }
-                    SectionItem(title = stringResource(id = R.string.facebook), icon = R.drawable.ic_insta) {
-
-                    }
-                }
-                SectionSetting(stringResource(id = R.string.support)){
-                    SectionItem(title = stringResource(id = R.string.contact)) {
-
-                    }
-                    SectionItem(title = stringResource(id = R.string.rating)) {
-
-                    }
-                }
-                SectionSetting(stringResource(id = R.string.other)){
-                    SectionItem(title = stringResource(id = R.string.app_info)) {
-
-                    }
-                }
-            }
-        }
-    }
-}
-
-
 @Composable
 fun SectionSetting(
     title: String = "Section 1",
@@ -227,14 +140,20 @@ fun SectionItem(title: String = "Instagram",icon: Int? =null, onClick: () -> Uni
         modifier = Modifier
             .fillMaxWidth(), onClick = { onClick() }
     ) {
-        Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(.08f), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier.wrapContentWidth(),verticalAlignment = Alignment.CenterVertically) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(Modifier.wrapContentWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 icon?.let {
-                    Icon(painterResource(id = it), contentDescription =null )
+                    Icon(painterResource(id = it), contentDescription =null,
+                        Modifier
+                            .width(20.dp)
+                            .height(20.dp) )
                 }
                 Text(text = title)
             }
-            Icon(painterResource(id = R.drawable.ic_forward), contentDescription = null,Modifier.padding(3.dp))
+            Icon(painterResource(id = R.drawable.ic_forward), contentDescription = null,
+                Modifier
+                    .width(20.dp)
+                    .height(20.dp))
         }
     }
 

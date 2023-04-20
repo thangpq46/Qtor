@@ -1,10 +1,10 @@
 package com.example.qtor.ui.editor
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -13,45 +13,47 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
 
 
 @Composable
-fun BottomNavigationTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) {
+fun BottomNavigationTool(viewModel: EditorViewModel) {
     val mainToolActive by viewModel.mainToolActive.collectAsState()
-    Column {
-        when (mainToolActive) {
-            EDIT_IMAGE_TOOl -> {
-                RemoveObjectTool(viewModel = viewModel)
+    Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground) {
+        Column {
+            when (mainToolActive) {
+                EDIT_IMAGE_TOOl -> {
+                    RemoveObjectTool(viewModel = viewModel)
+                }
+                STICKER_TOOL -> {
+                    StickersTool(viewModel = viewModel)
+                }
+                FILTERS_TOOl -> {
+                    FiltersTool(viewModel)
+                }
+                TEXT_TOOL->{
+                    TextTool(viewModel = viewModel)
+                }
+                ADJUST_TOOL->{
+                    AdjustColorTools(viewModel = viewModel)
+                }
             }
-            STICKER_TOOL -> {
-                StickersTool(viewModel = viewModel)
-            }
-            FILTERS_TOOl -> {
-                FiltersTool(viewModel)
-            }
-            TEXT_TOOL->{
-                TextTool(viewModel = viewModel)
-            }
-            ADJUST_TOOL->{
-                adjustTools(viewModel = viewModel)
-            }
-        }
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            itemsIndexed(items = LIST_OF_TOOLS) { index, tool ->
-                MainTool(tool,index==mainToolActive) {
-                    viewModel.setMainToolActive(index)
+            Divider(color = androidx.compose.material3.MaterialTheme.colorScheme.outline, thickness = 1.dp)
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                itemsIndexed(items = LIST_OF_TOOLS) { index, tool ->
+                    MainTool(tool,index==mainToolActive) {
+                        viewModel.setMainToolActive(index)
+                    }
                 }
             }
         }
@@ -90,11 +92,12 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
         }
         BottomNavigation(
             modifier = modifier,
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.primary
+//            backgroundColor = MaterialTheme.colors.onBackground,
+//            contentColor = MaterialTheme.colors.onBackground
         ) {
             bottomMenuItemsList.forEachIndexed { index, item ->
                 BottomNavigationItem(
+                    modifier = Modifier.background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground),
                     selected = (itemActive == index),
                     onClick = { viewModel.setRemoveObjectToolActive(index) },
                     icon = {
@@ -107,8 +110,8 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
                         Text(text = item.label)
                     },
                     enabled = true,
-                    selectedContentColor = MaterialTheme.colors.primary,
-                    unselectedContentColor = MaterialTheme.colors.secondary
+                    selectedContentColor = androidx.compose.material3.MaterialTheme.colorScheme.error,
+                    unselectedContentColor = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
                 )
             }
         }
@@ -125,7 +128,7 @@ fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
         Text(text = tool, modifier = Modifier
             .wrapContentWidth(),
             fontWeight = FontWeight.SemiBold
-            , fontSize = 13.sp, color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.primaryVariant
+            , fontSize = 13.sp, color = if (isSelected) MaterialTheme.colors.error else androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
         )
     }
 }
@@ -146,7 +149,7 @@ fun ProgressBar() {
 
 @Composable
 fun AITool(objects: List<AITarget>, onClick: (Int, AITarget) -> Unit) {
-    LazyRow {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.padding(vertical = 5.dp)) {
         itemsIndexed(items = objects) { index, item ->
             AIItem(item = item) {
                 onClick(index, item)
@@ -159,11 +162,14 @@ fun AITool(objects: List<AITarget>, onClick: (Int, AITarget) -> Unit) {
 fun AIItem(item: AITarget, onClick: () -> Unit) {
     Image(
         modifier = Modifier
-            .width(100.dp)
-            .height(100.dp)
-            .clickable { onClick() },
+            .width(70.dp)
+            .height(70.dp)
+            .clickable { onClick() }
+            .clip(RoundedCornerShape(5.dp)).border(
+                BorderStroke(5.dp, androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
+                RoundedCornerShape(5.dp)
+            ),
         bitmap = item.origin,
         contentDescription = null
     )
-    Text(text = item.isSelected.toString())
 }

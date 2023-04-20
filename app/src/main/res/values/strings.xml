@@ -43,4 +43,8 @@
     <string name="rating">Rating &amp; Reviews</string>
     <string name="other">Other</string>
     <string name="app_info">App information</string>
+    <string name="display">Display</string>
+    <string name="language">Language</string>
+    <string name="vn">vietnamese</string>
+    <string name="us">United States</string>
 </resources>

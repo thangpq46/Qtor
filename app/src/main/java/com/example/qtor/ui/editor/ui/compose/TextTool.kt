@@ -7,10 +7,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -26,6 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
+import com.example.qtor.util.removeFolderAndEx
 
 
 @Composable
@@ -80,41 +84,39 @@ fun TextTool(viewModel: EditorViewModel) {
         Color.Green, Color.LightGray, Color.Magenta, Color.Yellow
     )
 
-    LazyRow {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(vertical = 5.dp)) {
         items(colors) {
             Box(
                 modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp)
-                    .padding(2.dp)
-                    .border(2.dp, Brush.linearGradient(listOf(Color.Black, Color.Yellow,Color.Green)), shape = RectangleShape)
+                    .width(25.dp)
+                    .height(25.dp)
+                    .clip(CircleShape)
                     .background(it).clickable { textColor=it }
             )
         }
     }
 
 
-    LazyRow {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         items(items = fonts) {
             Box(
-                contentAlignment = Alignment.Center, modifier = Modifier.border(
-                    1.dp, MaterialTheme.colors.primary,
-                    RectangleShape
-                )
+                contentAlignment = Alignment.Center, modifier = Modifier.clip(RoundedCornerShape(5.dp))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
             ) {
                 Text(
                     modifier = Modifier
-                        .width(150.dp)
-                        .height(50.dp)
+                        .width(70.dp)
+                        .height(70.dp)
                         .wrapContentHeight(Alignment.CenterVertically)
                         .clickable {
                             userTextFont = it.fontName
                         },
-                    maxLines = 1,
+                    maxLines = 2,
                     textAlign = TextAlign.Center,
-                    fontSize = MaterialTheme.typography.h5.fontSize,
-                    text = stringResource(id = R.string.text_demo_font),
-                    fontFamily = fontFamily(it.fontName)
+                    fontSize = MaterialTheme.typography.h6.fontSize,
+                    text = removeFolderAndEx(it.fontName) ,
+                    fontFamily = fontFamily(it.fontName),
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
                 )
             }
         }

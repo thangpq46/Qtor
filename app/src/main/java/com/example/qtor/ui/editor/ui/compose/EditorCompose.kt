@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,7 +51,7 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
     viewModel.initFonts()
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colors.background
+        color = androidx.compose.material3.MaterialTheme.colorScheme.inverseSurface
     ) {
         val state by viewModel.stateScreen.collectAsState()
         val mainToolActive by viewModel.mainToolActive.collectAsState()
@@ -91,9 +89,7 @@ fun EditorTheme(viewModel: EditorViewModel, context: Context) {
                 }
             }
             BottomNavigationTool(
-                Modifier
-                    .background(MaterialTheme.colors.onSurface)
-                    .weight(2f), viewModel = viewModel
+                viewModel = viewModel
             )
         }
         if (!state) {

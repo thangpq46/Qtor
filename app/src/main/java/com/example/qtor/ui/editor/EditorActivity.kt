@@ -3,11 +3,13 @@ package com.example.qtor.ui.editor
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,13 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.compose.AppTheme
 import com.example.qtor.R
 import com.example.qtor.constant.IMAGE_TO_EDIT
 import com.example.qtor.constant.TOOL_INIT_INDEX
 import com.example.qtor.constant.URI_SAVED_IMAGE
-import com.example.qtor.ui.editor.ui.theme.QTorTheme
+import com.example.qtor.ui.setting.ui.theme.QTorTheme
 import com.example.qtor.ui.share.ShareImageActivity
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import org.opencv.android.OpenCVLoader
 
 class EditorActivity : ComponentActivity() {
@@ -49,7 +51,7 @@ class EditorActivity : ComponentActivity() {
         }
         viewModel.setBrightness(1.001f)
         setContent {
-            QTorTheme {
+            AppTheme {
                 var showDialog by remember {
                     mutableStateOf(false)
                 }
@@ -67,7 +69,7 @@ class EditorActivity : ComponentActivity() {
                                 Icon(
                                     imageVector = Icons.Filled.ArrowBack,
                                     contentDescription = "Back",
-                                    tint = MaterialTheme.colors.primary
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiary
                                 )
                             }
                         },
@@ -89,7 +91,7 @@ class EditorActivity : ComponentActivity() {
                                 Icon(
                                     painterResource(id = R.drawable.ic_download),
                                     contentDescription = "DownLoad",
-                                    tint = MaterialTheme.colors.primary
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiary
                                 )
                             }
                         }

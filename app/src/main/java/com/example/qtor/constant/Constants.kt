@@ -3,6 +3,7 @@ package com.example.qtor.constant
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import com.example.qtor.R
+import com.example.qtor.data.model.Language
 import com.example.qtor.data.model.Tool
 
 const val IMAGE_TO_EDIT = "image_to_edit"
@@ -66,14 +67,14 @@ val ADJUST_LIST_TOOLS = listOf(
     Tool(R.drawable.ic_warp, R.string.adjust_warmth),
     Tool(R.drawable.ic_contrast, R.string.adjust_contrast),
     Tool(R.drawable.ic_saturation, R.string.adjust_saturation),
-//    Tool(R.drawable.ic_saturation, R.string.adjust_vibrance),
-//    Tool(R.drawable.ic_sharpen, R.string.adjust_sharpen),
-//    Tool(R.drawable.ic_grain, R.string.adjust_Grain),
-//    Tool(R.drawable.ic_hightlight, R.string.adjust_highlight),
-//    Tool(R.drawable.ic_shadow, R.string.adjust_shadow),
-//    Tool(R.drawable.ic_fade, R.string.adjust_fade),
-//    Tool(R.drawable.ic_brilliance, R.string.adjust_brilliance),
-//    Tool(R.drawable.ic_tint, R.string.adjust_Tint)
+    Tool(R.drawable.ic_saturation, R.string.adjust_vibrance),
+    Tool(R.drawable.ic_sharpen, R.string.adjust_sharpen),
+    Tool(R.drawable.ic_grain, R.string.adjust_Grain),
+    Tool(R.drawable.ic_hightlight, R.string.adjust_highlight),
+    Tool(R.drawable.ic_shadow, R.string.adjust_shadow),
+    Tool(R.drawable.ic_fade, R.string.adjust_fade),
+    Tool(R.drawable.ic_brilliance, R.string.adjust_brilliance),
+    Tool(R.drawable.ic_tint, R.string.adjust_Tint)
 )
 const val FIFTH_TI = 50
 const val HUREND = 100
@@ -108,3 +109,9 @@ const val MAIL_TO="mailto:"
 const val MAIL_SUBJECT="QTOR Support"
 const val INTENT_TITLE="Send email"
 const val DEFAULT_MESSAGE_VALUE="   "
+val LANGUAGES = listOf(
+    Language(R.string.us,"en",R.drawable.ic_us),
+    Language(R.string.vn,"vi",R.drawable.ic_vn),
+)
+const val QTOR_SHARED="qtor"
+const val LANGUAGE_SHARED="language"

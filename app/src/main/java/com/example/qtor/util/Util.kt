@@ -76,3 +76,7 @@ fun RectF.scale(factor: Float) {
 fun Int.toDp(context: Context):Dp{
     return (this/context.resources.displayMetrics.density).dp
 }
+
+fun removeFolderAndEx(string: String):String{
+    return string.substringAfterLast("/") .substringBeforeLast(".").uppercase()
+}
