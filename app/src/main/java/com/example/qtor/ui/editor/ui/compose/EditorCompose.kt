@@ -46,9 +46,9 @@ fun CircleButton(image: ImageVector, onClick: () -> Unit) {
 @Composable
 fun EditorTheme(viewModel: EditorViewModel, context: Context) {
     // A surface container using the 'background' color from the theme
-    viewModel.initAssetData(STORAGE_STICKERS)
-    viewModel.initAssetData(STORAGE_FILTERS)
     viewModel.initFonts()
+    val drawX by viewModel.drawX.collectAsState()
+    val drawY by viewModel.drawY.collectAsState()
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = androidx.compose.material3.MaterialTheme.colorScheme.inverseSurface

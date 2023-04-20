@@ -1,5 +1,6 @@
 package com.example.qtor.constant
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.imageResource
 import com.example.qtor.R
@@ -115,3 +116,18 @@ val LANGUAGES = listOf(
 )
 const val QTOR_SHARED="qtor"
 const val LANGUAGE_SHARED="language"
+val colors = mutableListOf(
+    Color(0xffffffff), Color(0xffbbbbbb), Color(0xff4e4e4e),
+    Color(0xFF212121), Color(0xFF010101), Color(0xffffd7cd),
+    Color(0xfffaab9c), Color(0xffcd3041), Color(0xfffff3c3),
+    Color(0xfffee46b), Color(0xfff5af57), Color(0xfff48432),
+    Color(0xfff43d03), Color(0xfffff1f4), Color(0xfffee1e3),
+    Color(0xfff7aab4), Color(0xfffc2777), Color(0xffebd4e8),
+    Color(0xffba63b2), Color(0xffa8368e), Color(0xff93d3f9),
+    Color(0xff80aced), Color(0xff2260a9), Color(0xff93d3f9),
+    Color(0xffdeefe9), Color(0xffb0d0c3), Color(0xff4aaea2),
+    Color(0xff0e8c77), Color(0xff05674e), Color(0xffd2e5a3),
+    Color(0xffaecd7d), Color(0xffa2ae1a), Color(0xff6e8618),
+    Color(0xff446240), Color(0xffe4d8be), Color(0xffd5c68f),
+    Color(0xffa58258), Color(0xff74462c)
+)

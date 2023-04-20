@@ -1,12 +1,10 @@
 package com.example.qtor.ui.editor
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -29,6 +27,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
+import com.example.qtor.constant.colors
 import com.example.qtor.util.removeFolderAndEx
 
 
@@ -41,33 +40,42 @@ fun TextTool(viewModel: EditorViewModel) {
         mutableStateOf<String?>(null)
     }
     var textColor by remember {
-        mutableStateOf(Color.Black)
+        mutableStateOf(Color.White)
     }
     val focusManager = LocalFocusManager.current
     val fonts = viewModel.fonts
+    var colorActive by remember {
+        mutableStateOf(0)
+    }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         TextField(modifier = Modifier
             .fillMaxWidth()
-            .weight(7f), value = text, colors = TextFieldDefaults.textFieldColors(textColor = textColor), placeholder = {
-            Text(
-                text = stringResource(id = R.string.text_place_holder),
-                fontFamily = userTextFont?.let { fontFamily(fontName = it) },
+            .weight(7f),
+            value = text,
+            colors = TextFieldDefaults.textFieldColors(textColor = textColor),
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.text_place_holder),
+                    fontFamily = userTextFont?.let { fontFamily(fontName = it) },
+                    textAlign = TextAlign.Center,
+                    color = textColor,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            onValueChange = {
+                text = it
+            },
+            singleLine = true,
+            textStyle = TextStyle(
                 textAlign = TextAlign.Center,
-                color = textColor,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }, onValueChange = {
-            text = it
-        }, singleLine = true, textStyle = TextStyle(
-            textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.h5.fontSize,
-            fontFamily = userTextFont?.let { fontFamily(fontName = it) }
-        ))
+                fontSize = MaterialTheme.typography.h5.fontSize,
+                fontFamily = userTextFont?.let { fontFamily(fontName = it) }
+            ))
         IconButton(modifier = Modifier.weight(1f), onClick = {
             if (text.isNotEmpty()) {
-                viewModel.addText(text, userTextFont, 12f,textColor)
+                viewModel.addText(text, userTextFont, 12f, textColor)
                 focusManager.clearFocus()
                 text = ""
             }
@@ -79,19 +87,28 @@ fun TextTool(viewModel: EditorViewModel) {
             )
         }
     }
-    val colors = mutableListOf<Color>(
-        Color.Blue, Color.Black, Color.Cyan, Color.DarkGray, Color.Gray,
-        Color.Green, Color.LightGray, Color.Magenta, Color.Yellow
-    )
 
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(vertical = 5.dp)) {
-        items(colors) {
+
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.padding(5.dp)
+    ) {
+        itemsIndexed(colors) {index,item->
             Box(
                 modifier = Modifier
                     .width(25.dp)
                     .height(25.dp)
                     .clip(CircleShape)
-                    .background(it).clickable { textColor=it }
+                    .background(item)
+                    .border(
+                        BorderStroke(
+                            if (index==colorActive)3.dp else (-1).dp,
+                            androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                        ), shape = CircleShape
+                    )
+                    .clickable { textColor = item
+                    colorActive=index
+                    }
             )
         }
     }
@@ -100,8 +117,13 @@ fun TextTool(viewModel: EditorViewModel) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
         items(items = fonts) {
             Box(
-                contentAlignment = Alignment.Center, modifier = Modifier.clip(RoundedCornerShape(5.dp))
-                    .background(androidx.compose.material3.MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(
+                        androidx.compose.material3.MaterialTheme.colorScheme.outline,
+                        RoundedCornerShape(5.dp)
+                    )
             ) {
                 Text(
                     modifier = Modifier
@@ -114,7 +136,7 @@ fun TextTool(viewModel: EditorViewModel) {
                     maxLines = 2,
                     textAlign = TextAlign.Center,
                     fontSize = MaterialTheme.typography.h6.fontSize,
-                    text = removeFolderAndEx(it.fontName) ,
+                    text = removeFolderAndEx(it.fontName),
                     fontFamily = fontFamily(it.fontName),
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
                 )

@@ -54,9 +54,31 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _filter = MutableStateFlow<ImageBitmap?>(null)
     val filter: StateFlow<ImageBitmap?> = _filter
-
     private val _currentBitmapIndex = MutableStateFlow(0)
     val currentBitmapIndex: StateFlow<Int> = _currentBitmapIndex
+
+    private val _drawX = MutableStateFlow(0f)
+    private val _drawY = MutableStateFlow(0f)
+    val drawX: StateFlow<Float> = _drawX
+    val drawY: StateFlow<Float> = _drawY
+
+    fun moveImage(x: Float, y: Float) {
+        _drawX.value += x
+        _drawY.value += y
+    }
+
+    private val _scaleF = MutableStateFlow(1f)
+    val scaleF: StateFlow<Float> = _scaleF
+    fun resetDrawPos() {
+        _drawX.value = 0f
+        _drawY.value = 0f
+        _scaleF.value = 1f
+    }
+
+    fun updateScale(f:Float){
+        _scaleF.value*=f
+    }
+
     internal fun initBitmaps(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -573,62 +595,64 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         _contrast.value = process
     }
 
-    private val _warmth= MutableStateFlow(1f)
-    val warmth :StateFlow<Float> = _warmth
+    private val _warmth = MutableStateFlow(1f)
+    val warmth: StateFlow<Float> = _warmth
 
-    fun setWarmth(temp:Float){
-        _warmth.value=temp
+    fun setWarmth(temp: Float) {
+        _warmth.value = temp
     }
 
-    fun addText(text:String,fontName: String?,fontSize:Float,textColor: Color){
+    fun addText(text: String, fontName: String?, fontSize: Float, textColor: Color) {
         viewModelScope.launch(Dispatchers.IO) {
-            val bitmap  = createImageBitmapFromText(application,text,fontName,textColor)
+            val bitmap = createImageBitmapFromText(application, text, fontName, textColor)
             val left = _editorWidth.value / 2f - bitmap.width / 2
             val top = _editorHeight.value / 2f - bitmap.height / 2
             val right = left + bitmap.width
             val bottom = top + bitmap.height
-            addSticker(Sticker(
-                RectF(left, top, right, bottom),
-                bitmap.asImageBitmap()
-            ))
+            addSticker(
+                Sticker(
+                    RectF(left, top, right, bottom),
+                    bitmap.asImageBitmap()
+                )
+            )
         }
     }
 
-    fun saveImage(onSuccess:(Uri)->Unit,onFailed:()->Unit){
+    fun saveImage(onSuccess: (Uri) -> Unit, onFailed: () -> Unit) {
         viewModelScope.launch {
-            _stateScreen.value= LOADING
+            _stateScreen.value = LOADING
             val image = imageBitmaps[_currentBitmapIndex.value].image.asAndroidBitmap()
             val name = "aaa.jpg"
-            val imageCollection: Uri = if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.Q){
+            val imageCollection: Uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-            }else{
+            } else {
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             }
             val content = ContentValues().apply {
-                put(MediaStore.Images.Media.DISPLAY_NAME,name)
-                put(MediaStore.Images.Media.MIME_TYPE,"image/jpeg")
-                put(MediaStore.Images.Media.WIDTH,image.width)
-                put(MediaStore.Images.Media.HEIGHT,image.height)
+                put(MediaStore.Images.Media.DISPLAY_NAME, name)
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.WIDTH, image.width)
+                put(MediaStore.Images.Media.HEIGHT, image.height)
             }
-             try {
-                application.contentResolver.insert(imageCollection,content)?.also {
-                    application.contentResolver.openOutputStream(it).use { os->
-                        if (!image.compress(Bitmap.CompressFormat.JPEG,100,os)){
+            try {
+                application.contentResolver.insert(imageCollection, content)?.also {
+                    application.contentResolver.openOutputStream(it).use { os ->
+                        if (!image.compress(Bitmap.CompressFormat.JPEG, 100, os)) {
                             throw IOException("Failed to save BMP")
-                        }else{
+                        } else {
                             viewModelScope.launch(Dispatchers.Main) {
                                 onSuccess(it)
                             }
                         }
                     }
                 } ?: throw IOException("Failed to Create Media Entry")
-                 _stateScreen.value= INDILE
+                _stateScreen.value = INDILE
 
-            }catch (
+            } catch (
                 e: IOException
-            ){
+            ) {
                 e.printStackTrace()
-                 _stateScreen.value= INDILE
+                _stateScreen.value = INDILE
                 viewModelScope.launch(Dispatchers.Main) {
                     onFailed()
                 }
