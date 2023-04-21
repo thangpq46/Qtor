@@ -6,6 +6,9 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.qtor.ui.theme.Typography
 
 
@@ -74,6 +77,27 @@ private val DarkColors = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
+val replyTypography = Typography(
+    titleLarge = TextStyle(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 22. sp,
+        lineHeight = 28. sp,
+        letterSpacing = 0. sp
+    ),
+    titleMedium = TextStyle(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 16. sp,
+        lineHeight = 24. sp,
+        letterSpacing = 0.15.sp
+    ),
+    titleSmall = TextStyle(
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12. sp,
+        lineHeight = 20. sp,
+        letterSpacing = 0.15.sp
+    ),
+)
+
 @Composable
 fun AppTheme(
   useDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -88,5 +112,7 @@ fun AppTheme(
   MaterialTheme(
     colorScheme = colors,
     content = content,
+      typography = replyTypography
   )
 }
+

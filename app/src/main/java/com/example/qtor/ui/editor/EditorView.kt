@@ -3,7 +3,9 @@ package com.example.qtor.ui.editor
 import android.content.Context
 import android.util.Log
 import android.view.MotionEvent
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
@@ -15,6 +17,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -58,9 +61,6 @@ fun EditorView(
 //        mutableStateOf(1f)
 //    }
     val scaleF by viewModel.scaleF.collectAsState()
-    var moving by remember {
-        mutableStateOf(false)
-    }
     val screenState by viewModel.stateScreen.collectAsState()
     //Adjust
     val brightness by viewModel.brightness.collectAsState()
@@ -70,7 +70,8 @@ fun EditorView(
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
     //icon
-    val icDelete = context.getDrawable(R.drawable.ic_delete)
+    val icDelete =
+        context.getDrawable(R.drawable.ic_delete)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
     val icCopy = context.getDrawable(R.drawable.ic_copy)
@@ -93,28 +94,20 @@ fun EditorView(
     }
     val drawX by viewModel.drawX.collectAsState()
     val drawY by viewModel.drawY.collectAsState()
-    val imageMatrix by remember {
-        mutableStateOf(ImageMatrix())
-    }
+    val imageMatrix by viewModel.imageMatrix.collectAsState()
+
     LaunchedEffect(Pair(brightness, contrast)) {
-        imageMatrix.mBrightness = brightness
-        imageMatrix.mContrast = contrast
-        imageMatrix.mSaturation = saturation
-        imageMatrix.mWarmth = warmth
-        imageMatrix.updateMatrix()
+        viewModel.updateImageMatrix()
     }
     LaunchedEffect(Pair(saturation, warmth)) {
-        imageMatrix.mBrightness = brightness
-        imageMatrix.mContrast = contrast
-        imageMatrix.mSaturation = saturation
-        imageMatrix.mWarmth = warmth
-        imageMatrix.updateMatrix()
+        viewModel.updateImageMatrix()
     }
     val filter by viewModel.filter.collectAsState()
 
     val drawColor = MaterialTheme.colors.primary
 
     fun processScaleAndMoveView(event: MotionEvent): Boolean {
+
         viewModel.moveImage((event.getX(0) - downX) * .8f, (event.getY(0) - downY) * .8f)
         currentDistance = getDistance(event)
         val s = (currentDistance / preDistance)
@@ -235,7 +228,7 @@ fun EditorView(
                         ) {
                             viewModel.removeSticker()
                         }
-                        if (isInsideRotatedRect(
+                        else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -246,7 +239,7 @@ fun EditorView(
                         ) {
                             viewModel.addSticker(stickers[itemActive])
                         }
-                        if (isInsideRotatedRect(
+                        else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -258,7 +251,7 @@ fun EditorView(
                             found = true
                             viewModel.flipItemActiveHorizontally()
                         }
-                        if (isInsideRotatedRect(
+                        else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -332,9 +325,6 @@ fun EditorView(
         }
         .drawBehind {
             if (imageBitmaps.isNotEmpty()) {
-                for (i in imageMatrix.mColorMatrix.array) {
-                    Log.d("AAA", i.toString())
-                }
                 drawImage(
                     imageBitmaps[currentBitmapIndex].image,
                     dstOffset = IntOffset.Zero,
@@ -360,6 +350,9 @@ fun EditorView(
                 }
             }
         }
+//        .pointerInput(Unit){
+//            detectDragGestures { change, dragAmount ->  }
+//        }
 
     ) {
 

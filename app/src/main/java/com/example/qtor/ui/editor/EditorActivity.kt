@@ -44,6 +44,11 @@ class EditorActivity : ComponentActivity() {
         viewModel.setBrightness(1.001f)
         setContent {
             AppTheme {
+                val notification by viewModel.notification.collectAsState()
+                if (notification!=""){
+                    Toast.makeText(this,notification,Toast.LENGTH_SHORT).show()
+                    viewModel.rsNoti()
+                }
                 var showDialog by remember {
                     mutableStateOf(false)
                 }
@@ -111,7 +116,10 @@ class EditorActivity : ComponentActivity() {
                                 disabledElevation = 0.dp
                             )) {
                                 Icon(
-                                    modifier = Modifier.clickable { viewModel.resetDrawPos() }.width(35.dp).height(35.dp),
+                                    modifier = Modifier
+                                        .clickable { viewModel.resetDrawPos() }
+                                        .width(35.dp)
+                                        .height(35.dp),
                                     painter = painterResource(id = R.drawable.ic_fit_screen),
                                     contentDescription = null,
                                     tint = androidx.compose.material3.MaterialTheme.colorScheme.onTertiary
@@ -123,7 +131,7 @@ class EditorActivity : ComponentActivity() {
                 if (showDialog) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                         .fillMaxSize()
-                        .clickable { showDialog = false }) {
+                        .clickable { }) {
                         CustomDialogUI(onCancel = {
                             showDialog = false
                         }, onConfirm = {

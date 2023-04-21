@@ -10,6 +10,6 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     protected var repository: ImageRepository
 
     init {
-        repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
+        repository = ImageRepository(application)
     }
 }

@@ -6,10 +6,13 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.view.MotionEvent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.example.qtor.data.repository.RetrofitClient
 import java.io.File
+import java.io.IOException
 import kotlin.math.sqrt
 
 fun getFolderInData(application: Application, folderName: String): File {
@@ -56,7 +59,7 @@ fun getDistance(event: MotionEvent): Float {
     return sqrt((dx * dx + dy * dy).toDouble()).toFloat()
 }
 
-fun RectF.getIntSize():IntSize{
+fun RectF.getIntSize(): IntSize {
     return IntSize(this.width().toInt(), this.height().toInt())
 }
 
@@ -73,10 +76,28 @@ fun RectF.scale(factor: Float) {
     bottom = rectCenterY + newHeight / 2F
 }
 
-fun Int.toDp(context: Context):Dp{
-    return (this/context.resources.displayMetrics.density).dp
+fun Int.toDp(context: Context): Dp {
+    return (this / context.resources.displayMetrics.density).dp
 }
 
-fun removeFolderAndEx(string: String):String{
-    return string.substringAfterLast("/") .substringBeforeLast(".").uppercase()
+fun removeFolderAndEx(string: String): String {
+    return string.substringAfterLast("/").substringBeforeLast(".").uppercase()
+}
+
+suspend fun Context.pingGoogle(): Boolean {
+    return try {
+        RetrofitClient.api.pingGoogle()
+        true
+    } catch (e: IOException) {
+        false
+    }
+
+}
+
+fun RectF.getSize(): Size {
+    return Size(this.width(), this.height())
+}
+
+fun Size.toIntSize(): IntSize {
+    return IntSize(this.width.toInt(), this.height.toInt())
 }

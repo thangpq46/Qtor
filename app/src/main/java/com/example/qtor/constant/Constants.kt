@@ -59,7 +59,7 @@ const val ASSET_PATH = "file:///android_asset/"
 const val BASE_URL = "https://apis.clipdrop.co/"
 const val OLD_EXTENSION = "webp"
 const val NEW_EXTENSION = "png"
-const val FILTER_ALPHA = 0.3f
+const val FILTER_ALPHA = 0.2f
 const val ONE_SECOND = 1000L
 const val TOOL_INIT_INDEX = "ToolActive"
 const val ADJUST_TOOL = 4
@@ -131,3 +131,6 @@ val colors = mutableListOf(
     Color(0xff446240), Color(0xffe4d8be), Color(0xffd5c68f),
     Color(0xffa58258), Color(0xff74462c)
 )
+const val API_KEY="6e5026a54275eee7d07f3c8f2742c8cec7da474d2b3f34432f678c421526d39d7856f28e1c7142f775cfd9fa92cada45"
+const val GOOGLE_URL = "https://www.google.com/"
+const val APP_NAME="qtor"

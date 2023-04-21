@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.RectF
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import com.example.qtor.constant.*
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -28,6 +30,8 @@ class RemoteDataSource(private val context: Context) : DataSource {
         application: Application,
         callback: DataSource.StickersCallback
     ) {
+        Firebase.storage.maxDownloadRetryTimeMillis=5000L
+        Firebase.storage.maxOperationRetryTimeMillis=5000L
         Firebase.storage.getReference(STORAGE_STICKERS).listAll().addOnSuccessListener {
             it.items.forEach { item ->
                 val itemFile = File(getFolderInData(application, STORAGE_STICKERS), item.name)
@@ -43,55 +47,96 @@ class RemoteDataSource(private val context: Context) : DataSource {
                         )
                     )
                 }.addOnFailureListener {
-
+                    callback.onDataNotAvailable()
                 }
             }
         }.addOnFailureListener {
-
+            callback.onDataNotAvailable()
         }
     }
 
-    override suspend fun removeObjects(
-        image: ImageBitmap,
-        mask: ImageBitmap,
-        callback: DataSource.RemoveObjectsCallback
-    ) {
-
-    }
-
-    override suspend fun cleanupBitmap(
-        image: Bitmap,
-        mask: Bitmap,
-        callback: DataSource.EraserObjectCallback
-    ) {
-//            val imageByteArray = ByteArrayOutputStream()
-//            image.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
-//            val maskByteArray = ByteArrayOutputStream()
-//            mask.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
-//            val requestBody =
-//                MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
-//                    IMAGE_FILE, FILE_NAME, RequestBody.create(
-//                        MediaType.parse(MEDIA_PARSE_TYPE), imageByteArray.toByteArray()
-//                    )
-//                ).addFormDataPart(
-//                    MASK_FILE, FILE_NAME_MASK, RequestBody.create(
-//                        MediaType.parse(MEDIA_PARSE_TYPE), maskByteArray.toByteArray()
-//                    )
-//                ).build()
+//    override suspend fun removeObjects(
+//        image: ImageBitmap,
+//        mask: ImageBitmap,
+//        callback: DataSource.RemoveObjectsCallback
+//    ) {
+////        val image = resizeBitmapApi(currentBitmap)
+////        val resizeMask = Bitmap.createScaledBitmap(mask, image.width, image.height, true)
+//        val imageByteArray = ByteArrayOutputStream()
+//        image.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
+//        val maskByteArray = ByteArrayOutputStream()
+//        mask.asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
+////        _process.postValue(PERCENT_ON_START)
+//        val requestBody =
+//            MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
+//                IMAGE_FILE, FILE_NAME, RequestBody.create(
+//                    MEDIA_PARSE_TYPE.toMediaTypeOrNull(), imageByteArray.toByteArray()
+//                )
+//            ).addFormDataPart(
+//                MASK_FILE, FILE_NAME_MASK, RequestBody.create(
+//                    MEDIA_PARSE_TYPE.toMediaTypeOrNull(), maskByteArray.toByteArray()
+//                )
+//            ).build()
 //        val client = OkHttpClient()
 //        val request = Request.Builder()
 //            .header(HEADER_AUTH_KEY, "Firebase.remoteConfig.getString(CONFIG_API_KEY)")
 //            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody).build()
 //        try {
 //            val response = client.newCall(request).execute()
-//             if (response.isSuccessful && response.body() != null) {
-//                callback.onCloudComplete(BitmapFactory.decodeStream(response.body().byteStream()).asImageBitmap())
+//             if (response.isSuccessful && response.body != null) {
+//                 callback.onCloudSuccess(BitmapFactory.decodeStream(response.body!!.byteStream()).asImageBitmap())
 //            } else {
-//                callback.onFailed("no internet")
+//                callback.onFailed(response.code.toString())
+////                    emit(Resource.DataError(response.code()))
+//
 //            }
 //        } catch (e: IOException) {
-//            callback.onFailed("no internet")
+//            callback.onFailed("501")
+////                emit(Resource.DataError(NO_INTERNET_ERROR_CODE))
+//
 //        }
+//    }
+
+    override suspend fun cleanupBitmap(
+        image: Bitmap,
+        mask: Bitmap,
+        callback: DataSource.EraserObjectCallback
+    ) {
+//        val image = resizeBitmapApi(currentBitmap)
+//        val resizeMask = Bitmap.createScaledBitmap(mask, image.width, image.height, true)
+        val imageByteArray = ByteArrayOutputStream()
+        image.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
+        val maskByteArray = ByteArrayOutputStream()
+        mask.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
+//        _process.postValue(PERCENT_ON_START)
+        val requestBody =
+            MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
+                IMAGE_FILE, FILE_NAME, RequestBody.create(
+                    MEDIA_PARSE_TYPE.toMediaTypeOrNull(), imageByteArray.toByteArray()
+                )
+            ).addFormDataPart(
+                MASK_FILE, FILE_NAME_MASK, RequestBody.create(
+                    MEDIA_PARSE_TYPE.toMediaTypeOrNull(), maskByteArray.toByteArray()
+                )
+            ).build()
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .header(HEADER_AUTH_KEY, API_KEY)
+            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody).build()
+        try {
+            val response = client.newCall(request).execute()
+            if (response.isSuccessful && response.body != null) {
+                callback.onCloudComplete(BitmapFactory.decodeStream(response.body!!.byteStream()).asImageBitmap())
+            } else {
+                callback.onFailed(response.code.toString())
+//                    emit(Resource.DataError(response.code()))
+
+            }
+        } catch (e: IOException) {
+            callback.onFailed("501")
+//                emit(Resource.DataError(NO_INTERNET_ERROR_CODE))
+
+        }
 
     }
 
@@ -100,6 +145,8 @@ class RemoteDataSource(private val context: Context) : DataSource {
         folderName: String,
         callBack: DataSource.StickerLoadCallBack
     ) {
+        Firebase.storage.maxDownloadRetryTimeMillis=3000
+        Firebase.storage.maxOperationRetryTimeMillis=5000
         val appDir =
             ContextCompat.getExternalFilesDirs(context, null)[0]
         val filtersDir = File(appDir, folderName)

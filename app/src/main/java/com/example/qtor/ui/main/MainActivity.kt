@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.compose.AppTheme
 import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.ui.editor.EditorActivity
@@ -77,8 +78,8 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
-    QTorTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+    AppTheme {
+        Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Card(
                     modifier = Modifier,
@@ -112,20 +113,20 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
                             .padding(vertical = 15.dp)
                             .clickable {
                                 onClick(index)
-                            }) {
+                            },
+                            color = Color.Transparent
+                        ) {
                             Column {
-                                Image(
-                                    painter = painterResource(id = tool.resourceID),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(vertical = 10.dp)
-                                )
+                                Icon(modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Transparent)
+                                    .padding(vertical = 10.dp),painter = painterResource(id = tool.resourceID), contentDescription = null, tint =androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer )
                                 Text(
                                     text = stringResource(id = tool.toolNameID),
                                     textAlign = TextAlign.Center,
-                                    fontSize = MaterialTheme.typography.h6.fontSize,
-                                    modifier = Modifier.fillMaxWidth()
+                                    fontSize = androidx.compose.material3.MaterialTheme.typography.titleSmall.fontSize,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                             }
 
@@ -133,13 +134,16 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
 
                     }
                 }
-                Button(onClick = { onClick(null) }) {
+                Button(onClick = { onClick(null) }, colors = ButtonDefaults.buttonColors(
+                    backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                )
+                ) {
                     Text(
                         text = stringResource(id = R.string.start_edit),
                         modifier = Modifier
                             .fillMaxWidth(.8f),
                         textAlign = TextAlign.Center,
-                        fontSize = MaterialTheme.typography.h6.fontSize
+                        fontSize = androidx.compose.material3.MaterialTheme.typography.titleMedium.fontSize
                     )
                 }
             }
@@ -149,7 +153,7 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
                     IconButton(onClick = {
                         context.startActivity(Intent(context,SettingActivity::class.java))
                     }) {
-                        Icon(Icons.Default.Settings,null, tint = MaterialTheme.colors.primary)
+                        Icon(Icons.Default.Settings,null, tint = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer)
                     }
                 })
             }

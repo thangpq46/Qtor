@@ -11,10 +11,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
+import kotlin.reflect.KFunction1
 
 
 @Composable
@@ -39,21 +40,27 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                 FILTERS_TOOl -> {
                     FiltersTool(viewModel)
                 }
-                TEXT_TOOL->{
+                TEXT_TOOL -> {
                     TextTool(viewModel = viewModel)
                 }
-                ADJUST_TOOL->{
+                ADJUST_TOOL -> {
                     AdjustColorTools(viewModel = viewModel)
                 }
             }
-            Divider(color = androidx.compose.material3.MaterialTheme.colorScheme.outline, thickness = 1.dp)
+            Divider(
+                color = androidx.compose.material3.MaterialTheme.colorScheme.outline,
+                thickness = 1.dp
+            )
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 itemsIndexed(items = LIST_OF_TOOLS) { index, tool ->
-                    MainTool(tool,index==mainToolActive) {
-                        viewModel.setMainToolActive(index)
-                    }
+                    MainTool(
+                        index,
+                        tool,
+                        index == mainToolActive,
+                        onClick = viewModel::setMainToolActive
+                    )
                 }
             }
         }
@@ -75,9 +82,9 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
     val bottomMenuItemsList = prepareBottomMenu()
     val itemActive by viewModel.removeObjectToolActive.collectAsState()
     val bitmapIndex by viewModel.currentBitmapIndex.collectAsState()
-    val AIObjects = if (viewModel.imageBitmaps.isNotEmpty()){
+    val AIObjects = if (viewModel.imageBitmaps.isNotEmpty()) {
         viewModel.imageBitmaps[bitmapIndex].AIObj
-    } else{
+    } else {
         mutableListOf()
     }
     Column {
@@ -119,16 +126,19 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
 }
 
 @Composable
-fun MainTool(tool: String,isSelected:Boolean, onClick: () -> Unit) {
+fun MainTool(index: Int, tool: String, isSelected: Boolean, onClick: KFunction1<Int, Unit>) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier
         .height(50.dp)
         .clickable {
-            onClick()
+            onClick(index)
         }) {
-        Text(text = tool, modifier = Modifier
-            .wrapContentWidth(),
-            fontWeight = FontWeight.SemiBold
-            , fontSize = 13.sp, color = if (isSelected) MaterialTheme.colors.error else androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
+        Text(
+            text = tool,
+            modifier = Modifier
+                .wrapContentWidth(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 13.sp,
+            color = if (isSelected) MaterialTheme.colors.error else androidx.compose.material3.MaterialTheme.colorScheme.onSecondary
         )
     }
 }
@@ -149,7 +159,10 @@ fun ProgressBar() {
 
 @Composable
 fun AITool(objects: List<AITarget>, onClick: (Int, AITarget) -> Unit) {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.padding(vertical = 5.dp)) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        modifier = Modifier.padding(vertical = 5.dp)
+    ) {
         itemsIndexed(items = objects) { index, item ->
             AIItem(item = item) {
                 onClick(index, item)
@@ -165,8 +178,12 @@ fun AIItem(item: AITarget, onClick: () -> Unit) {
             .width(70.dp)
             .height(70.dp)
             .clickable { onClick() }
-            .clip(RoundedCornerShape(5.dp)).border(
-                BorderStroke(5.dp, androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
+            .clip(RoundedCornerShape(5.dp))
+            .border(
+                BorderStroke(
+                    5.dp,
+                    androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                ),
                 RoundedCornerShape(5.dp)
             ),
         bitmap = item.origin,

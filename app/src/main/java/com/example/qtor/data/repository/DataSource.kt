@@ -13,17 +13,17 @@ interface DataSource {
         fun onDataNotAvailable()
     }
 
-    suspend fun removeObjects(
-        image: ImageBitmap,
-        mask: ImageBitmap,
-        callback: RemoveObjectsCallback
-    )
-
-    interface RemoveObjectsCallback {
-        fun onLocalSuccess(result: ImageBitmap)
-        fun onCloudSuccess(result: ImageBitmap)
-        fun onFailed(error: String)
-    }
+//    suspend fun removeObjects(
+//        image: ImageBitmap,
+//        mask: ImageBitmap,
+//        callback: RemoveObjectsCallback
+//    )
+//
+//    interface RemoveObjectsCallback {
+//        fun onLocalSuccess(result: ImageBitmap)
+//        fun onCloudSuccess(result: ImageBitmap)
+//        fun onFailed(error: String)
+//    }
 
     suspend fun cleanupBitmap(image:Bitmap, mask: Bitmap, callback: EraserObjectCallback)
 

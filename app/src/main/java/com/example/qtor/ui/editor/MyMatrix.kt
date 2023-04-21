@@ -3,7 +3,7 @@ package com.example.qtor.ui.editor
 import android.graphics.ColorMatrix
 
 
-internal class ImageMatrix {
+ class ImageMatrix {
     var m = FloatArray(4 * 5)
     var mColorMatrix = ColorMatrix()
     var mTmpColorMatrix = ColorMatrix()

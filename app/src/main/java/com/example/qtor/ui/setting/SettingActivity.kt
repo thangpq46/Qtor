@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,10 +34,10 @@ class SettingActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.background
                 ) {
                     Column {
-                        TopAppBar {
+                        TopAppBar(backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.onBackground) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CompositionLocalProvider(
                                     LocalContentAlpha provides ContentAlpha.high,
@@ -48,6 +49,7 @@ class SettingActivity : ComponentActivity() {
                                         Icon(
                                             Icons.Default.ArrowBack,
                                             contentDescription = "Back",
+                                            tint = androidx.compose.material3.MaterialTheme.colorScheme.background
                                         )
 
                                     }
@@ -66,7 +68,8 @@ class SettingActivity : ComponentActivity() {
                                             modifier = Modifier.fillMaxWidth(),
                                             textAlign = TextAlign.Center,
                                             maxLines = 1,
-                                            text = stringResource(id = R.string.settings)
+                                            text = stringResource(id = R.string.settings),
+                                            color = androidx.compose.material3.MaterialTheme.colorScheme.background
                                         )
                                     }
                                 }
@@ -146,14 +149,14 @@ fun SectionItem(title: String = "Instagram",icon: Int? =null, onClick: () -> Uni
                     Icon(painterResource(id = it), contentDescription =null,
                         Modifier
                             .width(20.dp)
-                            .height(20.dp) )
+                            .height(20.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground )
                 }
-                Text(text = title)
+                Text(text = title, color =androidx.compose.material3.MaterialTheme.colorScheme.onBackground )
             }
             Icon(painterResource(id = R.drawable.ic_forward), contentDescription = null,
                 Modifier
                     .width(20.dp)
-                    .height(20.dp))
+                    .height(20.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
         }
     }
 

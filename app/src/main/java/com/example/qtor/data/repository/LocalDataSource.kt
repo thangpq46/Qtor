@@ -33,13 +33,13 @@ class LocalDataSource(private val context: Context) : DataSource {
         callback.onLocalLoaded(listStickers)
     }
 
-    override suspend fun removeObjects(
-        image: ImageBitmap,
-        mask: ImageBitmap,
-        callback: DataSource.RemoveObjectsCallback
-    ) {
-        callback.onLocalSuccess(image)
-    }
+//    override suspend fun removeObjects(
+//        image: ImageBitmap,
+//        mask: ImageBitmap,
+//        callback: DataSource.RemoveObjectsCallback
+//    ) {
+//        callback.onLocalSuccess(image)
+//    }
 
     override suspend fun cleanupBitmap(
         image: Bitmap,
