@@ -33,10 +33,12 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
 import com.google.mlkit.vision.segmentation.Segmentation
 import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import java.io.IOException
@@ -494,20 +496,20 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
     }
 
-    private val _assetsStickers = mutableStateListOf<Filter>()
-    val assetsStickers: List<Filter> = _assetsStickers
+    private val _assetsStickers = mutableStateListOf<AssetItem>()
+    val assetsStickers: List<AssetItem> = _assetsStickers
 
-    private val _assetsFilters = mutableStateListOf<Filter>()
-    val assetsFilters: List<Filter> = _assetsFilters
+    private val _assetsFilters = mutableStateListOf<AssetItem>()
+    val assetsFilters: List<AssetItem> = _assetsFilters
 
     internal fun initAssetData(folderName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val assetManager = getApplication<Application>().assets
             val fileList = assetManager.list(folderName) ?: return@launch
-            val list = mutableListOf<Filter>()
+            val list = mutableListOf<AssetItem>()
             for (fileName in fileList) {
                 yield()
-                list.add(Filter(fileName, "$ASSET_PATH$folderName/$fileName"))
+                list.add(AssetItem(fileName, "$ASSET_PATH$folderName/$fileName"))
             }
             when (folderName) {
                 STORAGE_STICKERS -> {
@@ -520,7 +522,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
     }
 
-    fun addSticker(asset: Filter) {
+    fun addSticker(asset: AssetItem) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
             repository.getSticker(
@@ -563,7 +565,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
-    fun setFilter(asset: Filter) {
+    fun setFilter(asset: AssetItem) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
             repository.getSticker(
@@ -735,5 +737,72 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     fun rsNoti() {
         _notification.value = ""
+    }
+
+    private val _frames = mutableStateListOf<List<AssetItem>>()
+    val frames : List<List<AssetItem>>  = _frames
+
+    private val _frameContainerActive = MutableStateFlow(-1)
+    val frameContainerActive : StateFlow<Int> = _frameContainerActive
+    fun initFrames(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val assetManager = getApplication<Application>().assets
+            val fileList = assetManager.list(FRAME_FOLDER) ?: return@launch
+            val list = mutableListOf<MutableList<AssetItem>>()
+            for (i in fileList.indices) {
+                list.add(mutableListOf())
+                val f = assetManager.list(FRAME_FOLDER + "/" + fileList[i])
+                f?.let {
+                    for (sticker in it) {
+                        list[i].add(
+                            AssetItem(
+                                sticker,
+                                "$ASSET_PATH$FRAME_FOLDER/${fileList[i]}/$sticker"
+                            )
+                        )
+                    }
+                }
+            }
+            _frames.addAll(list)
+            setFrameContainerActive(0)
+        }
+    }
+
+    fun setFrameContainerActive (index: Int){
+        _frameContainerActive.update {
+            index
+        }
+    }
+    private val _frame = MutableStateFlow<ImageBitmap?>(null)
+    val frame : StateFlow<ImageBitmap?> = _frame
+    fun setFrame(asset: AssetItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _stateScreen.value = LOADING
+            repository.getSticker(
+                changeFileEx(asset.name),
+                STORAGE_FRAMES,
+                object : DataSource.StickerLoadCallBack {
+                    override fun onLocalLoad(bitmap: Bitmap) {
+                        _frame.update {
+                            bitmap.asImageBitmap()
+                        }
+                        _stateScreen.value = INDILE
+                    }
+
+                    override fun onFireBaseLoad(bitmap: Bitmap) {
+                        _frame.update {
+                            bitmap.asImageBitmap()
+                        }
+                        _stateScreen.value = INDILE
+                    }
+
+                    override fun onLoadFailed(e: Exception) {
+                        _stateScreen.value = INDILE
+                        //TODO Handle err
+                    }
+
+                })
+        }
+
     }
 }

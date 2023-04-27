@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
+import com.example.qtor.ui.editor.ui.compose.FrameTool
 import kotlin.reflect.KFunction1
 
 
@@ -33,6 +34,9 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
             when (mainToolActive) {
                 EDIT_IMAGE_TOOl -> {
                     RemoveObjectTool(viewModel = viewModel)
+                }
+                FRAME_TOOL ->{
+                    FrameTool(viewModel = viewModel)
                 }
                 STICKER_TOOL -> {
                     StickersTool(viewModel = viewModel)

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun FiltersTool(viewModel: EditorViewModel){
 }
 
 @Composable
-fun Filter(item:com.example.qtor.data.model.Filter,onClick: ()->Unit){
+fun Filter(item:com.example.qtor.data.model.AssetItem, onClick: ()->Unit){
     Surface(modifier = Modifier.padding(horizontal = 5.dp), shape = RoundedCornerShape(5.dp)) {
         Image(painter = painterResource(id = R.drawable.demo2), contentDescription = null, modifier = Modifier
             .width(60.dp)

@@ -12,7 +12,7 @@ const val TYPE_ALL_IMAGE = "image/*"
 val LIST_OF_TOOLS = mutableListOf(
     "TEMPLATE",
     "TOOLS",
-    "PORTRAIT",
+    "FRAME",
     "FILTERS",
     "ADJUST",
     "EFFECTS",
@@ -24,6 +24,7 @@ val LIST_OF_TOOLS = mutableListOf(
     "AI FILTER"
 )
 const val EDIT_IMAGE_TOOl = 1
+const val FRAME_TOOL = 2
 const val STICKER_TOOL = 6
 const val TEXT_TOOL = 7
 const val FILTERS_TOOl = 3
@@ -54,6 +55,7 @@ const val DRAW_ALPHA = 0.6f
 const val LOADING = false
 const val INDILE = true
 const val STORAGE_FILTERS = "filters"
+const val STORAGE_FRAMES = "frames"
 const val STORAGE_FONTS = "fonts"
 const val ASSET_PATH = "file:///android_asset/"
 const val BASE_URL = "https://apis.clipdrop.co/"
@@ -105,17 +107,17 @@ val images = listOf(
 const val OWNER_FACEBOOK = "https://www.facebook.com/quangthang46/"
 const val OWNER_INSTAGRAM = "https://www.instagram.com/pqt46/"
 const val OWNER_TIKTOK = "https://www.tiktok.com/@qthang46"
-const val OWNER_GMAIL="pqt4621@gmail.com"
-const val MAIL_TO="mailto:"
-const val MAIL_SUBJECT="QTOR Support"
-const val INTENT_TITLE="Send email"
-const val DEFAULT_MESSAGE_VALUE="   "
+const val OWNER_GMAIL = "pqt4621@gmail.com"
+const val MAIL_TO = "mailto:"
+const val MAIL_SUBJECT = "QTOR Support"
+const val INTENT_TITLE = "Send email"
+const val DEFAULT_MESSAGE_VALUE = "   "
 val LANGUAGES = listOf(
-    Language(R.string.us,"en",R.drawable.ic_us),
-    Language(R.string.vn,"vi",R.drawable.ic_vn),
+    Language(R.string.us, "en", R.drawable.ic_us),
+    Language(R.string.vn, "vi", R.drawable.ic_vn),
 )
-const val QTOR_SHARED="qtor"
-const val LANGUAGE_SHARED="language"
+const val QTOR_SHARED = "qtor"
+const val LANGUAGE_SHARED = "language"
 val colors = mutableListOf(
     Color(0xffffffff), Color(0xffbbbbbb), Color(0xff4e4e4e),
     Color(0xFF212121), Color(0xFF010101), Color(0xffffd7cd),
@@ -131,6 +133,17 @@ val colors = mutableListOf(
     Color(0xff446240), Color(0xffe4d8be), Color(0xffd5c68f),
     Color(0xffa58258), Color(0xff74462c)
 )
-const val API_KEY="6e5026a54275eee7d07f3c8f2742c8cec7da474d2b3f34432f678c421526d39d7856f28e1c7142f775cfd9fa92cada45"
+const val API_KEY =
+    "6e5026a54275eee7d07f3c8f2742c8cec7da474d2b3f34432f678c421526d39d7856f28e1c7142f775cfd9fa92cada45"
 const val GOOGLE_URL = "https://www.google.com/"
-const val APP_NAME="qtor"
+const val APP_NAME = "qtor"
+const val FRAME_FOLDER = "frames"
+val FRAME_TITLES= listOf<Int>(
+    R.string.frame_1,
+    R.string.frame_2,
+    R.string.frame_3,
+    R.string.frame_4,
+    R.string.frame_5,
+    R.string.frame_6,
+    R.string.frame_7
+)

@@ -42,6 +42,7 @@ class EditorActivity : ComponentActivity() {
         viewModel.initAssetData(STORAGE_STICKERS)
         viewModel.initAssetData(STORAGE_FILTERS)
         viewModel.setBrightness(1.001f)
+        viewModel.initFrames()
         setContent {
             AppTheme {
                 val notification by viewModel.notification.collectAsState()

@@ -47,4 +47,11 @@
     <string name="language">Language</string>
     <string name="vn">vietnamese</string>
     <string name="us">United States</string>
+    <string name="frame_1">Simple</string>
+    <string name="frame_2">Trending</string>
+    <string name="frame_3">VIP</string>
+    <string name="frame_4">Posters</string>
+    <string name="frame_5">Fantasy</string>
+    <string name="frame_6">Summers</string>
+    <string name="frame_7">Winter</string>
 </resources>

@@ -48,4 +48,11 @@
     <string name="language">Ngôn Ngữ</string>
     <string name="vn">Tiếng Việt</string>
     <string name="us">Tiếng Anh</string>
+    <string name="frame_1">Frame1</string>
+    <string name="frame_2">Frame2</string>
+    <string name="frame_3">Frame3</string>
+    <string name="frame_4">Frame4</string>
+    <string name="frame_5">Frame5</string>
+    <string name="frame_6">Summers</string>
+    <string name="frame_7">Winter</string>
 </resources>

@@ -40,6 +40,7 @@ fun EditorView(
     val currentBitmapIndex by viewModel.currentBitmapIndex.collectAsState()
     val viewWidth by viewModel.editorWidth.collectAsState()
     val viewHeight by viewModel.editorHeight.collectAsState()
+    val frame by viewModel.frame.collectAsState()
     var downX by remember {
         mutableStateOf(0f)
     }
@@ -402,6 +403,13 @@ fun EditorView(
                         }
                     }
                 }
+            }
+            frame?.let {
+                drawImage(
+                    it,
+                    dstOffset = IntOffset.Zero,
+                    dstSize = IntSize(viewWidth, viewHeight)
+                )
             }
             filter?.let {
                 drawImage(
