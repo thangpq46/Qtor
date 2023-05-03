@@ -88,7 +88,7 @@ const val URI_SAVED_IMAGE = "uri"
 val tools = listOf(
     Tool(R.drawable.ic_template, R.string.tool_template),
     Tool(R.drawable.ic_remove_object, R.string.tool_remove_object),
-    Tool(R.drawable.ic_portrait, R.string.tool_portrait),
+    Tool(R.drawable.ic_frame, R.string.tool_frame),
     Tool(R.drawable.ic_filter, R.string.tool_filters),
     Tool(R.drawable.ic_adjust, R.string.tool_Adjust),
     Tool(R.drawable.ic_effects, R.string.tool_effects),

@@ -6,7 +6,7 @@
     <string name="text_demo_font">ABCDEFGH</string>
     <string name="tool_template">Mẫu</string>
     <string name="tool_remove_object">Xóa</string>
-    <string name="tool_portrait">Chân Dung</string>
+    <string name="tool_frame">Chân Dung</string>
     <string name="tool_filters">Bộ Lọc</string>
     <string name="tool_Adjust">Điều Chỉnh</string>
     <string name="tool_effects">Hiệu Ứng</string>

@@ -5,7 +5,7 @@
     <string name="text_demo_font">ABCDEFGH</string>
     <string name="tool_template">Template</string>
     <string name="tool_remove_object">Remove</string>
-    <string name="tool_portrait">Portrait</string>
+    <string name="tool_frame">Frame</string>
     <string name="tool_filters">Filters</string>
     <string name="tool_Adjust">Adjust</string>
     <string name="tool_effects">Effects</string>

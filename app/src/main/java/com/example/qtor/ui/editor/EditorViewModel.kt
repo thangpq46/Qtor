@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.ContentValues
 import android.graphics.*
 import android.graphics.Matrix
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -18,6 +19,9 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.round
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.*
 import com.example.qtor.data.repository.DataSource
@@ -95,90 +99,96 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     internal fun initBitmaps(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
+            Glide.with(application).asBitmap().load(uri).into(object :CustomTarget<Bitmap>(){
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    _imageActions.add(ImageAction(resource.asImageBitmap(), mutableListOf()))
+                    initEditorSize(resource)
+                    val scaleBitmap =
+                        Bitmap.createScaledBitmap(resource, _editorWidth.value, _editorHeight.value, true)
+                    val image = InputImage.fromBitmap(scaleBitmap, 0)
+                    segmenter.process(image).addOnSuccessListener { results ->
+                        val mask = results.buffer
+                        val maskWidth = results.width
+                        val maskHeight = results.height
+                        val colors = IntArray(maskWidth * maskHeight)
+                        for (i in 0 until maskWidth * maskHeight) {
+                            val backgroundLikelihood = 1 - mask.float
 
-            val bitmap = BitmapFactory.decodeStream(
-                getApplication<Application>().contentResolver.openInputStream(uri)
-            )
-            _imageActions.add(ImageAction(bitmap.asImageBitmap(), mutableListOf()))
-            initEditorSize(bitmap)
-            val scaleBitmap =
-                Bitmap.createScaledBitmap(bitmap, _editorWidth.value, _editorHeight.value, true)
-            val image = InputImage.fromBitmap(scaleBitmap, 0)
-            segmenter.process(image).addOnSuccessListener { results ->
-                val mask = results.buffer
-                val maskWidth = results.width
-                val maskHeight = results.height
-                val colors = IntArray(maskWidth * maskHeight)
-                for (i in 0 until maskWidth * maskHeight) {
-                    val backgroundLikelihood = 1 - mask.float
-
-                    if (backgroundLikelihood > 0.9) {
-                    } else if (backgroundLikelihood > 0.2) {
-                        colors[i] = android.graphics.Color.WHITE
-                    } else {
-                        colors[i] = android.graphics.Color.WHITE
-                    }
-                }
-                val maskAI = Bitmap.createBitmap(
-                    colors, maskWidth, maskHeight, Bitmap.Config.ARGB_8888
-                )
-                objectDetector.process(image).addOnSuccessListener { detectedObjects ->
-                    val list = mutableListOf<AITarget>()
-                    for (obj in detectedObjects) {
-                        val maskPeopleObj = Bitmap.createBitmap(
-                            maskAI,
-                            obj.boundingBox.left,
-                            obj.boundingBox.top,
-                            obj.boundingBox.width(),
-                            obj.boundingBox.height()
-                        )
-
-                        val maskOthersObj = Bitmap.createBitmap(
-                            obj.boundingBox.width(),
-                            obj.boundingBox.height(),
-                            Bitmap.Config.ARGB_8888
-                        )
-                        val canvas = android.graphics.Canvas(maskOthersObj)
-                        canvas.drawColor(android.graphics.Color.WHITE)
-                        val origin = Bitmap.createBitmap(
-                            scaleBitmap,
-                            obj.boundingBox.left,
-                            obj.boundingBox.top,
-                            obj.boundingBox.width(),
-                            obj.boundingBox.height()
-                        )
-                        Log.d("AAA", obj.labels.toString())
-                        if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
-                            list.add(
-                                AITarget(
-                                    obj.boundingBox,
-                                    maskPeopleObj.asImageBitmap(),
-                                    origin.asImageBitmap(),
-                                    TYPE_PEOPLE
-                                )
-                            )
-                        } else {
-                            list.add(
-                                AITarget(
-                                    obj.boundingBox,
-                                    maskOthersObj.asImageBitmap(),
-                                    origin.asImageBitmap(),
-                                    TYPE_OTHERS
-                                )
-                            )
+                            if (backgroundLikelihood > 0.9) {
+                            } else if (backgroundLikelihood > 0.2) {
+                                colors[i] = android.graphics.Color.WHITE
+                            } else {
+                                colors[i] = android.graphics.Color.WHITE
+                            }
                         }
+                        val maskAI = Bitmap.createBitmap(
+                            colors, maskWidth, maskHeight, Bitmap.Config.ARGB_8888
+                        )
+                        objectDetector.process(image).addOnSuccessListener { detectedObjects ->
+                            val list = mutableListOf<AITarget>()
+                            for (obj in detectedObjects) {
+                                val maskPeopleObj = Bitmap.createBitmap(
+                                    maskAI,
+                                    obj.boundingBox.left,
+                                    obj.boundingBox.top,
+                                    obj.boundingBox.width(),
+                                    obj.boundingBox.height()
+                                )
+
+                                val maskOthersObj = Bitmap.createBitmap(
+                                    obj.boundingBox.width(),
+                                    obj.boundingBox.height(),
+                                    Bitmap.Config.ARGB_8888
+                                )
+                                val canvas = android.graphics.Canvas(maskOthersObj)
+                                canvas.drawColor(android.graphics.Color.WHITE)
+                                val origin = Bitmap.createBitmap(
+                                    scaleBitmap,
+                                    obj.boundingBox.left,
+                                    obj.boundingBox.top,
+                                    obj.boundingBox.width(),
+                                    obj.boundingBox.height()
+                                )
+                                Log.d("AAA", obj.labels.toString())
+                                if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
+                                    list.add(
+                                        AITarget(
+                                            obj.boundingBox,
+                                            maskPeopleObj.asImageBitmap(),
+                                            origin.asImageBitmap(),
+                                            TYPE_PEOPLE
+                                        )
+                                    )
+                                } else {
+                                    list.add(
+                                        AITarget(
+                                            obj.boundingBox,
+                                            maskOthersObj.asImageBitmap(),
+                                            origin.asImageBitmap(),
+                                            TYPE_OTHERS
+                                        )
+                                    )
+                                }
+                            }
+                            _imageActions[0].AIObj.apply {
+                                addAll(list)
+                            }
+                        }.addOnFailureListener { e ->
+                            e.printStackTrace()
+                        }
+                    }.addOnFailureListener { e ->
+                        e.printStackTrace()
                     }
-                    _imageActions[0].AIObj.apply {
-                        addAll(list)
-                    }
-                }.addOnFailureListener { e ->
-                    e.printStackTrace()
-                }
-            }.addOnFailureListener { e ->
-                e.printStackTrace()
-            }
 //            }
-            _currentBitmapIndex.value = _imageActions.lastIndex
+                    _currentBitmapIndex.value = _imageActions.lastIndex
+                }
+
+                override fun onLoadCleared(placeholder: Drawable?) {
+//                    TODO("Not yet implemented")
+                }
+
+            })
+
         }
     }
 
