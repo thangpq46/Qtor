@@ -20,11 +20,11 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class RemoteDataSource(private val context: Context) : DataSource {
     override suspend fun getStickers(
@@ -61,10 +61,11 @@ class RemoteDataSource(private val context: Context) : DataSource {
         mask: Bitmap,
         callback: DataSource.EraserObjectCallback
     ) {
+        val resizedImage=resizeBitmapApi(image)
         val imageByteArray = ByteArrayOutputStream()
-        image.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
+        resizedImage.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, imageByteArray)
         val maskByteArray = ByteArrayOutputStream()
-        mask.compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
+        Bitmap.createScaledBitmap(mask,resizedImage.width,resizedImage.height,false).compress(Bitmap.CompressFormat.PNG, IMG_QUALITY, maskByteArray)
         val requestBody =
             MultipartBody.Builder().setType(MultipartBody.FORM).addFormDataPart(
                 IMAGE_FILE, FILE_NAME, RequestBody.create(
@@ -75,14 +76,22 @@ class RemoteDataSource(private val context: Context) : DataSource {
                     MEDIA_PARSE_TYPE.toMediaTypeOrNull(), maskByteArray.toByteArray()
                 )
             ).build()
-        val client = OkHttpClient()
-        val request = Request.Builder()
+        val client = OkHttpClient().newBuilder()
+            .connectTimeout(5, TimeUnit.MINUTES)
+            .writeTimeout(5, TimeUnit.MINUTES)
+            .readTimeout(5, TimeUnit.MINUTES).build()
+        val request = Request
+            .Builder()
             .header(HEADER_AUTH_KEY, API_KEY)
-            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody).build()
+            .url("https://clipdrop-api.co/cleanup/v1").post(requestBody)
+            .build()
         try {
-            val response = client.newCall(request).execute()
+            val response = client
+                .newCall(request).execute()
             if (response.isSuccessful && response.body != null) {
-                callback.onCloudComplete(BitmapFactory.decodeStream(response.body!!.byteStream()).asImageBitmap())
+                callback.onCloudComplete(
+                    BitmapFactory.decodeStream(response.body!!.byteStream()).asImageBitmap()
+                )
             } else {
                 callback.onFailed(response.code.toString())
 
@@ -140,4 +149,15 @@ class RemoteDataSource(private val context: Context) : DataSource {
         }
     }
 
+    private fun resizeBitmapApi(bitmap: Bitmap): Bitmap {
+        return if (bitmap.width * bitmap.height > BITMAP_MAX_PIXEL_CLOUD) {
+            val newWidth: Int =
+                kotlin.math.sqrt(BITMAP_MAX_PIXEL_CLOUD.toDouble() * bitmap.width / bitmap.height).toInt()
+            val newHeight: Int =
+                kotlin.math.sqrt(BITMAP_MAX_PIXEL_CLOUD.toDouble() * bitmap.height / bitmap.width).toInt()
+            Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+        } else {
+            bitmap
+        }
+    }
 }

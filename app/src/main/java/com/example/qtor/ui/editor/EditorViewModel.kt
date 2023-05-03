@@ -2,8 +2,10 @@ package com.example.qtor.ui.editor
 
 import android.app.Application
 import android.content.ContentValues
-import android.graphics.*
+import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.graphics.PointF
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -13,10 +15,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
@@ -43,6 +43,7 @@ import kotlinx.coroutines.yield
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import com.example.qtor.R
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
     private val _imageActions = mutableStateListOf<ImageAction>()
@@ -99,12 +100,17 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     internal fun initBitmaps(uri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
-            Glide.with(application).asBitmap().load(uri).into(object :CustomTarget<Bitmap>(){
+            Glide.with(application).asBitmap().load(uri).into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     _imageActions.add(ImageAction(resource.asImageBitmap(), mutableListOf()))
                     initEditorSize(resource)
                     val scaleBitmap =
-                        Bitmap.createScaledBitmap(resource, _editorWidth.value, _editorHeight.value, true)
+                        Bitmap.createScaledBitmap(
+                            resource,
+                            _editorWidth.value,
+                            _editorHeight.value,
+                            true
+                        )
                     val image = InputImage.fromBitmap(scaleBitmap, 0)
                     segmenter.process(image).addOnSuccessListener { results ->
                         val mask = results.buffer
@@ -316,17 +322,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _removeObjectToolActive = MutableStateFlow(BRUSH_MODE)
     val removeObjectToolActive: StateFlow<Int> = _removeObjectToolActive
-//    private val _currentRemoveActionIndex = MutableStateFlow(-1)
-//    val currentRemoveActionIndex: StateFlow<Int> = _currentRemoveActionIndex
-
-//    fun addRemoveObjectAction() {
-//        _removeObjectActions.add(
-//            RemoveObjectAction(
-//                _aiObjects.toList()
-//            )
-//        )
-//        _currentRemoveActionIndex.value = _currentRemoveActionIndex.value + 1
-//    }
 
     internal fun setRemoveObjectToolActive(index: Int) {
         _removeObjectToolActive.value = index
@@ -384,6 +379,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _stateScreen = MutableStateFlow(INDILE)
     val stateScreen: StateFlow<Boolean> = _stateScreen
+
     fun removeObject(
         path: Path? = null,
         obj: AITarget? = null,
@@ -443,7 +439,10 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
                 override fun onFailed(error: String) {
                     _stateScreen.value = INDILE
-                    Log.d("AAAsadas", error)
+                    _notification.update {
+
+                        application.getString(R.string.err_template)+ error
+                    }
                     viewModelScope.launch(Dispatchers.Main) {
                         onComplete()
                     }
@@ -627,10 +626,10 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             mSaturation = saturation.value
             mWarmth = warmth.value
             updateMatrix()
-            Log.d("MATRIX", "BRIGHTNESS: $mBrightness")
-            Log.d("MATRIX", "CONTRAST: $mContrast")
-            Log.d("MATRIX", "SATURATION: $mSaturation")
-            Log.d("MATRIX", "WARMTH: $mWarmth")
+//            Log.d("MATRIX", "BRIGHTNESS: $mBrightness")
+//            Log.d("MATRIX", "CONTRAST: $mContrast")
+//            Log.d("MATRIX", "SATURATION: $mSaturation")
+//            Log.d("MATRIX", "WARMTH: $mWarmth")
         }
 
     }
@@ -661,6 +660,14 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                     paint = stickerPaint
                 )
                 canvas.restore()
+            }
+            _frame.value?.let {
+                canvas.drawImageRect(
+                    image = it,
+                    dstSize = IntSize(image.width, image.height),
+                    dstOffset = IntOffset.Zero,
+                    paint = Paint()
+                )
             }
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val current = LocalDateTime.now().format(formatter)

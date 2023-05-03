@@ -150,6 +150,13 @@ val Filters = listOf(
     FilterObj(
         saturation = 1f,
         brightness = 1.01f,
+        warmth = 1f,
+        contrast = 1f,
+        nameID = R.string.filter_none
+    ),
+    FilterObj(
+        saturation = 1f,
+        brightness = 1.01f,
         warmth = 0.5f,
         contrast = 1f,
         nameID = R.string.filter_vivid
@@ -211,5 +218,5 @@ val Filters = listOf(
         nameID = R.string.filter_alpaca
     )
 )
-
+const val BITMAP_MAX_PIXEL_CLOUD = 12000000
 const val MAIN_TOOL_FILTER = 3

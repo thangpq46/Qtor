@@ -1,6 +1,7 @@
 package com.example.qtor.ui.editor.ui.compose
 
 import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,9 +22,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.qtor.R
 import com.example.qtor.constant.FRAME_TITLES
 import com.example.qtor.data.model.AssetItem
 import com.example.qtor.ui.editor.EditorViewModel
@@ -101,15 +105,22 @@ fun FrameTool(viewModel: EditorViewModel) {
 
 @Composable
 fun Frame(item: AssetItem, onClick: KFunction1<AssetItem, Unit>) {
-    AsyncImage(alignment = Alignment.Center,
-        modifier = Modifier
+    Surface {
+        Image(modifier = Modifier
             .width(100.dp)
-            .height(130.dp)
-            .clickable {
-                onClick(item)
-            }
-            .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp)),
-        model = Uri.parse(item.url),
-        contentDescription = null
-    )
+            .height(130.dp),painter = painterResource(id = R.drawable.demo2), contentDescription =null )
+        AsyncImage(alignment = Alignment.Center,
+            modifier = Modifier
+                .width(100.dp)
+                .height(130.dp)
+                .clickable {
+                    onClick(item)
+                }
+                ,
+            model = Uri.parse(item.url),
+            contentScale = ContentScale.FillBounds,
+            contentDescription = null
+        )
+    }
+
 }

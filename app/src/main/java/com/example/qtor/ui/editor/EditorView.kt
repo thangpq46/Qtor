@@ -1,8 +1,8 @@
 package com.example.qtor.ui.editor
 
 import android.content.Context
-import android.util.Log
 import android.view.MotionEvent
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -17,10 +17,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.unit.*
 import androidx.core.graphics.drawable.toBitmap
 import com.example.qtor.R
 import com.example.qtor.constant.*
@@ -68,19 +65,22 @@ fun EditorView(
     val mainToolActive by viewModel.mainToolActive.collectAsState()
     val removeObjectToolActive by viewModel.removeObjectToolActive.collectAsState()
     //icon
-    val icDelete =
-        context.getDrawable(R.drawable.ic_delete)
-            ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
-            ?.asImageBitmap()
-    val icCopy = context.getDrawable(R.drawable.ic_copy)
+    val icDelete = AppCompatResources.getDrawable(context, R.drawable.ic_delete)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
-    val icFlip = context.getDrawable(R.drawable.ic_flip)
+
+    val icCopy = AppCompatResources.getDrawable(context, R.drawable.ic_copy)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
-    val icScale = context.getDrawable(R.drawable.ic_scale)
+
+    val icFlip = AppCompatResources.getDrawable(context, R.drawable.ic_flip)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
+
+    val icScale = AppCompatResources.getDrawable(context, R.drawable.ic_scale)
+        ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
+        ?.asImageBitmap()
+
     //rect delete
     val rectDelete by viewModel.rectDelete.collectAsState()
     val rectCopy by viewModel.rectCopy.collectAsState()
@@ -205,15 +205,9 @@ fun EditorView(
                 } else if (event.pointerCount == 1) {
                     downX = event.x
                     downY = event.y
-                    Log.d("DOWNX", downX.toString())
-                    Log.d("DOWNY", downY.toString())
                     if (itemActive != -1) {
                         var found = false
                         val currentItem = stickers[itemActive]
-                        Log.d(
-                            "currentItem",
-                            "L ${currentItem.rect.left}  T ${currentItem.rect.top} R ${currentItem.rect.right} B ${currentItem.rect.bottom} "
-                        )
                         if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
@@ -335,20 +329,11 @@ fun EditorView(
                 MAIN_TOOL_STICKERS, MAIN_TOOL_FILTER, ADJUST_TOOL, MAIN_TOOL_TEXT -> {
                     processActionToolStickers(event)
                 }
-//                MAIN_TOOL_TEXT -> {
-//                    processActionToolStickers(event)
-//                }
-//                MAIN_TOOL_FILTER, ADJUST_TOOL->{
-//
-//                }
                 else -> {
                     true
                 }
             }
         }
-//        .pointerInput(Unit){
-//            detectDragGestures { change, dragAmount ->  }
-//        }
 
     ) {
 
