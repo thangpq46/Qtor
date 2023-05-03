@@ -101,3 +101,35 @@ fun RectF.getSize(): Size {
 fun Size.toIntSize(): IntSize {
     return IntSize(this.width.toInt(), this.height.toInt())
 }
+
+private fun ccw(a: org.opencv.core.Point, b: org.opencv.core.Point, c: org.opencv.core.Point) =
+    ((b.x - a.x) * (c.y - a.y)) > ((b.y - a.y) * (c.x - a.x))
+
+ fun convexHull(p: MutableList<org.opencv.core.Point>): List<org.opencv.core.Point> {
+    if (p.isEmpty()) return emptyList()
+    p.sortBy {
+        it.x
+    }
+    val h = mutableListOf<org.opencv.core.Point>()
+
+    // lower hull
+    for (pt in p) {
+        while (h.size >= 2 && !ccw(h[h.size - 2], h.last(), pt)) {
+            h.removeAt(h.lastIndex)
+        }
+        h.add(pt)
+    }
+
+    // upper hull
+    val t = h.size + 1
+    for (i in p.size - 2 downTo 0) {
+        val pt = p[i]
+        while (h.size >= t && !ccw(h[h.size - 2], h.last(), pt)) {
+            h.removeAt(h.lastIndex)
+        }
+        h.add(pt)
+    }
+
+    h.removeAt(h.lastIndex)
+    return h
+}

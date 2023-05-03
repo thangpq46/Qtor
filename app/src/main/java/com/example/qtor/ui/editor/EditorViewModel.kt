@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.data.model.*
 import com.example.qtor.data.repository.DataSource
@@ -40,10 +41,14 @@ import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import org.opencv.android.Utils
+import org.opencv.core.Mat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.Size
+import org.opencv.imgproc.Imgproc
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import com.example.qtor.R
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
     private val _imageActions = mutableStateListOf<ImageAction>()
@@ -133,39 +138,129 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                         objectDetector.process(image).addOnSuccessListener { detectedObjects ->
                             val list = mutableListOf<AITarget>()
                             for (obj in detectedObjects) {
-                                val maskPeopleObj = Bitmap.createBitmap(
-                                    maskAI,
-                                    obj.boundingBox.left,
-                                    obj.boundingBox.top,
-                                    obj.boundingBox.width(),
-                                    obj.boundingBox.height()
-                                )
-
-                                val maskOthersObj = Bitmap.createBitmap(
-                                    obj.boundingBox.width(),
-                                    obj.boundingBox.height(),
-                                    Bitmap.Config.ARGB_8888
-                                )
-                                val canvas = android.graphics.Canvas(maskOthersObj)
-                                canvas.drawColor(android.graphics.Color.WHITE)
-                                val origin = Bitmap.createBitmap(
-                                    scaleBitmap,
-                                    obj.boundingBox.left,
-                                    obj.boundingBox.top,
-                                    obj.boundingBox.width(),
-                                    obj.boundingBox.height()
-                                )
-                                Log.d("AAA", obj.labels.toString())
                                 if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
-                                    list.add(
-                                        AITarget(
-                                            obj.boundingBox,
-                                            maskPeopleObj.asImageBitmap(),
-                                            origin.asImageBitmap(),
-                                            TYPE_PEOPLE
-                                        )
+                                    if (obj.boundingBox.top - obj.boundingBox.height() / PERCENT_INCREASE_HEIGHT_AI_PEOPLE > 0) {
+                                        obj.boundingBox.top =
+                                            obj.boundingBox.top - obj.boundingBox.height() / PERCENT_INCREASE_HEIGHT_AI_PEOPLE
+                                    }
+                                    val maskPeopleObj = Bitmap.createBitmap(
+                                        maskAI,
+                                        obj.boundingBox.left,
+                                        obj.boundingBox.top,
+                                        obj.boundingBox.width(),
+                                        obj.boundingBox.height()
                                     )
-                                } else {
+
+
+
+                                    val origin = Bitmap.createBitmap(
+                                        scaleBitmap,
+                                        obj.boundingBox.left,
+                                        obj.boundingBox.top,
+                                        obj.boundingBox.width(),
+                                        obj.boundingBox.height()
+                                    )
+                                    Log.d("AAA", obj.labels.toString())
+//                                    if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
+                                        list.add(
+                                            AITarget(
+                                                obj.boundingBox,
+                                                maskPeopleObj.asImageBitmap(),
+                                                origin.asImageBitmap(),
+                                                TYPE_PEOPLE
+                                            )
+                                        )
+//                                    } else {
+//                                        list.add(
+//                                            AITarget(
+//                                                obj.boundingBox,
+//                                                maskOthersObj.asImageBitmap(),
+//                                                origin.asImageBitmap(),
+//                                                TYPE_OTHERS
+//                                            )
+//                                        )
+//                                    }
+                                }else{
+                                    val origin = Bitmap.createBitmap(
+                                        scaleBitmap,
+                                        obj.boundingBox.left,
+                                        obj.boundingBox.top,
+                                        obj.boundingBox.width(),
+                                        obj.boundingBox.height()
+                                    )
+                                    val temp = Bitmap.createBitmap(
+                                        scaleBitmap,
+                                        obj.boundingBox.left,
+                                        obj.boundingBox.top,
+                                        obj.boundingBox.width(),
+                                        obj.boundingBox.height()
+                                    )
+                                    val imageMat = Mat()
+                                    val outMat = Mat()
+                                    Utils.bitmapToMat(temp, imageMat)
+                                    Imgproc.blur(imageMat, imageMat, Size(BLUR, BLUR))
+                                    Imgproc.Canny(
+                                        imageMat,
+                                        outMat,
+                                        CANNY_THRESHOLD_1,
+                                        CANNY_THRESHOLD_2
+                                    )
+                                    val listContours = mutableListOf<MatOfPoint>()
+                                    Imgproc.findContours(
+                                        outMat,
+                                        listContours,
+                                        Mat(),
+                                        Imgproc.RETR_LIST,
+                                        Imgproc.CHAIN_APPROX_NONE
+                                    )
+                                    val contourOjb = android.graphics.Path()
+                                    val lp = mutableListOf<org.opencv.core.Point>()
+                                    for (c in listContours) {
+                                        lp.addAll(c.toList())
+                                    }
+                                    if (lp.size > 20) {
+                                        val a = convexHull(lp)
+                                        for (p in a) {
+                                            contourOjb.lineTo(p.x.toFloat(), p.y.toFloat())
+                                        }
+                                        contourOjb.lineTo(a[0].x.toFloat(), a[0].y.toFloat())
+//                                        contourOjb.translate(Offset(
+//                                            obj.boundingBox.left.toFloat(),
+//                                            obj.boundingBox.top.toFloat()
+//                                        ))
+                                    } else {
+                                        contourOjb.moveTo(
+                                            obj.boundingBox.left.toFloat(),
+                                            obj.boundingBox.top.toFloat()
+                                        )
+                                        contourOjb.lineTo(
+                                            obj.boundingBox.right.toFloat(),
+                                            obj.boundingBox.top.toFloat()
+                                        )
+                                        contourOjb.lineTo(
+                                            obj.boundingBox.right.toFloat(),
+                                            obj.boundingBox.bottom.toFloat()
+                                        )
+                                        contourOjb.lineTo(
+                                            obj.boundingBox.left.toFloat(),
+                                            obj.boundingBox.bottom.toFloat()
+                                        )
+                                        contourOjb.lineTo(
+                                            obj.boundingBox.left.toFloat(),
+                                            obj.boundingBox.top.toFloat()
+                                        )
+                                    }
+                                    val maskOthersObj = Bitmap.createBitmap(
+                                        obj.boundingBox.width(),
+                                        obj.boundingBox.height(),
+                                        Bitmap.Config.ARGB_8888
+                                    )
+                                    val canvas = android.graphics.Canvas(maskOthersObj)
+//                                    canvas.drawColor(android.graphics.Color.WHITE)
+                                    canvas.drawPath(contourOjb, android.graphics.Paint().apply {
+                                        color=android.graphics.Color.WHITE
+                                        style=android.graphics.Paint.Style.FILL
+                                    })
                                     list.add(
                                         AITarget(
                                             obj.boundingBox,
@@ -197,6 +292,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
         }
     }
+
+    private val _selectedObj = MutableStateFlow<AITarget?>(null)
+    val selectedObj :StateFlow<AITarget?> = _selectedObj
 
     internal fun addSticker(sticker: Sticker) {
         val rect = RectF(sticker.rect)
@@ -388,6 +486,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
+            obj?.let {objSelected->
+                _selectedObj.update {
+                    objSelected
+                }
+            }
             val image = _imageActions[_currentBitmapIndex.value].image.asAndroidBitmap()
             val mask = getMaskBitmap(path, obj, mode)
             repository.cleanupBitmap(image, mask, object : DataSource.EraserObjectCallback {
@@ -407,6 +510,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                 }
                             })
                     )
+                    obj?.let {objSelected->
+                        _selectedObj.update {
+                            null
+                        }
+                    }
                     _currentBitmapIndex.value = _imageActions.lastIndex
                     _stateScreen.value = INDILE
                     viewModelScope.launch(Dispatchers.Main) {
@@ -430,6 +538,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                 }
                             })
                     )
+                    obj?.let {
+                        _selectedObj.update {
+                            null
+                        }
+                    }
                     _currentBitmapIndex.value = _imageActions.lastIndex
                     _stateScreen.value = INDILE
                     viewModelScope.launch(Dispatchers.Main) {
@@ -440,8 +553,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                 override fun onFailed(error: String) {
                     _stateScreen.value = INDILE
                     _notification.update {
-
-                        application.getString(R.string.err_template)+ error
+                        application.getString(R.string.err_template) + error
                     }
                     viewModelScope.launch(Dispatchers.Main) {
                         onComplete()
@@ -790,4 +902,5 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
 
     }
+
 }

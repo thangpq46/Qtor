@@ -220,3 +220,7 @@ val Filters = listOf(
 )
 const val BITMAP_MAX_PIXEL_CLOUD = 12000000
 const val MAIN_TOOL_FILTER = 3
+const val BLUR = 2.0
+const val CANNY_THRESHOLD_1 = 125.0
+const val CANNY_THRESHOLD_2 = 175.0
+const val PERCENT_INCREASE_HEIGHT_AI_PEOPLE = 20

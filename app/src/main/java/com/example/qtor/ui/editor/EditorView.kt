@@ -52,6 +52,8 @@ fun EditorView(
     var scaling by remember {
         mutableStateOf(false)
     }
+    val selectedObj by viewModel.selectedObj.collectAsState()
+    val a= ColorFilter.tint(color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondary)
 //    var scaleF by remember {
 //        mutableStateOf(1f)
 //    }
@@ -423,6 +425,9 @@ fun EditorView(
                             it, drawColor, style = Fill, alpha = .6f
                         )
                     }
+                }
+                selectedObj?.let {
+                    drawImage(image = it.mask, dstOffset = it.box.offset().round(), dstSize = IntSize(it.box.width(),it.box.height()), alpha = DRAW_ALPHA, colorFilter = a)
                 }
             }
             else -> {
