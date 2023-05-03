@@ -25,12 +25,12 @@ interface DataSource {
 //        fun onFailed(error: String)
 //    }
 
-    suspend fun cleanupBitmap(image:Bitmap, mask: Bitmap, callback: EraserObjectCallback)
+    suspend fun cleanupBitmap(image: Bitmap, mask: Bitmap, callback: EraserObjectCallback)
 
     interface EraserObjectCallback {
         fun onLocalComplete(result: ImageBitmap)
         fun onCloudComplete(result: ImageBitmap)
-        fun onFailed(error:String)
+        fun onFailed(error: String)
     }
 
     suspend fun getSticker(name: String, folderName: String, callBack: StickerLoadCallBack)

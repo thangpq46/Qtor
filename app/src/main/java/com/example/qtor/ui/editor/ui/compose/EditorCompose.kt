@@ -1,16 +1,15 @@
-package com.example.qtor.ui.editor
+package com.example.qtor.ui.editor.ui.compose
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -18,17 +17,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.qtor.R
-import com.example.qtor.constant.LOADING
-import com.example.qtor.constant.MAIN_TOOl_REMOVE_OBJECT
-import com.example.qtor.constant.STORAGE_FILTERS
-import com.example.qtor.constant.STORAGE_STICKERS
 
 @Composable
 fun CircleButton(image: ImageVector, onClick: () -> Unit) {
@@ -43,65 +37,7 @@ fun CircleButton(image: ImageVector, onClick: () -> Unit) {
 }
 
 @Composable
-fun EditorTheme(viewModel: EditorViewModel, context: Context) {
-    // A surface container using the 'background' color from the theme
-    viewModel.initFonts()
-    val drawX by viewModel.drawX.collectAsState()
-    val drawY by viewModel.drawY.collectAsState()
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = androidx.compose.material3.MaterialTheme.colorScheme.inverseSurface
-    ) {
-        val state by viewModel.stateScreen.collectAsState()
-        val mainToolActive by viewModel.mainToolActive.collectAsState()
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (state == LOADING) {
-                ProgressBar()
-            }
-            EditorView(
-                context,
-                viewModel = viewModel
-            )
-
-        }
-        Column(
-            Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
-
-        ) {
-            if (mainToolActive == MAIN_TOOl_REMOVE_OBJECT) {
-                Row(
-                    horizontalArrangement = Arrangement.Start, modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                        .fillMaxWidth()
-                ) {
-                    CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_undo)) {
-                        viewModel.undo()
-                    }
-                    CircleButton(image = ImageVector.vectorResource(id = R.drawable.ic_redo)) {
-                        viewModel.redo()
-                    }
-                }
-            }
-            BottomNavigationTool(
-                viewModel = viewModel
-            )
-        }
-        if (!state) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .clickable { }) {}
-        }
-    }
-}
-
-
-@Composable
-fun CustomDialogUI(modifier: Modifier = Modifier,onCancel:()->Unit,onConfirm:()->Unit) {
+fun CustomDialogUI(modifier: Modifier = Modifier, onCancel: () -> Unit, onConfirm: () -> Unit) {
     Card(
         //shape = MaterialTheme.shapes.medium,
         shape = RoundedCornerShape(10.dp),
@@ -201,7 +137,7 @@ fun SnackbarDemo() {
             Snackbar(
 
                 action = {
-                    TextButton(onClick = {setSnackBarState(false)}) {
+                    TextButton(onClick = { setSnackBarState(false) }) {
                         Text("OK")
                     }
                 },

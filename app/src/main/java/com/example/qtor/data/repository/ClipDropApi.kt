@@ -11,5 +11,5 @@ interface ClipDropApi {
     suspend fun downloadImage(@Url url: String): Response<ResponseBody>
 
     @GET
-    suspend fun pingGoogle(@Url url: String= GOOGLE_URL): Response<ResponseBody>
+    suspend fun pingGoogle(@Url url: String = GOOGLE_URL): Response<ResponseBody>
 }

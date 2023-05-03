@@ -3,12 +3,9 @@ package com.example.qtor.data.repository
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.compose.ui.graphics.ImageBitmap
 import com.example.qtor.util.pingGoogle
 
 class ImageRepository(
-//    private val remoteDataSource: RemoteDataSource,
-//    private val localDataSource: LocalDataSource,
     private val context: Context
 ) : DataSource {
     private val remoteDataSource: RemoteDataSource = RemoteDataSource(context)
@@ -21,15 +18,6 @@ class ImageRepository(
         localDataSource.getStickers(application, callback)
         remoteDataSource.getStickers(application, callback)
     }
-
-//    override suspend fun removeObjects(
-//        image: ImageBitmap,
-//        mask: ImageBitmap,
-//        callback: DataSource.RemoveObjectsCallback
-//    ) {
-//        localDataSource.removeObjects(image,mask,callback)
-//        remoteDataSource.removeObjects(image, mask, callback)
-//    }
 
     override suspend fun cleanupBitmap(
         image: Bitmap,

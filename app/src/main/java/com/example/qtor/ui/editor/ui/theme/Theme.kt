@@ -3,13 +3,12 @@ package com.example.compose
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.qtor.ui.theme.Typography
 
 
 private val LightColors = lightColorScheme(
@@ -80,39 +79,39 @@ private val DarkColors = darkColorScheme(
 val replyTypography = Typography(
     titleLarge = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 22. sp,
-        lineHeight = 28. sp,
-        letterSpacing = 0. sp
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
     ),
     titleMedium = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 16. sp,
-        lineHeight = 24. sp,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
         letterSpacing = 0.15.sp
     ),
     titleSmall = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 12. sp,
-        lineHeight = 20. sp,
+        fontSize = 12.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.15.sp
     ),
 )
 
 @Composable
 fun AppTheme(
-  useDarkTheme: Boolean = isSystemInDarkTheme(),
-  content: @Composable() () -> Unit
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable() () -> Unit
 ) {
-  val colors = if (!useDarkTheme) {
-    LightColors
-  } else {
-    DarkColors
-  }
+    val colors = if (!useDarkTheme) {
+        LightColors
+    } else {
+        DarkColors
+    }
 
-  MaterialTheme(
-    colorScheme = colors,
-    content = content,
-      typography = replyTypography
-  )
+    MaterialTheme(
+        colorScheme = colors,
+        content = content,
+        typography = replyTypography
+    )
 }
 

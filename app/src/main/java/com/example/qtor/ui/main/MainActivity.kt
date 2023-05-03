@@ -37,7 +37,6 @@ import com.example.qtor.R
 import com.example.qtor.constant.*
 import com.example.qtor.ui.editor.EditorActivity
 import com.example.qtor.ui.setting.SettingActivity
-import com.example.qtor.ui.theme.QTorTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -77,9 +76,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
+fun MainActivityUI(context: Context, onClick: (Int?) -> Unit) {
     AppTheme {
-        Surface(modifier = Modifier.fillMaxSize(), color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary
+        ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Card(
                     modifier = Modifier,
@@ -109,18 +111,24 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
                 ) {
                     itemsIndexed(tools) { index, tool ->
                         // Replace this with your item composable
-                        Surface(modifier = Modifier
-                            .padding(vertical = 15.dp)
-                            .clickable {
-                                onClick(index)
-                            },
+                        Surface(
+                            modifier = Modifier
+                                .padding(vertical = 15.dp)
+                                .clickable {
+                                    onClick(index)
+                                },
                             color = Color.Transparent
                         ) {
                             Column {
-                                Icon(modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Transparent)
-                                    .padding(vertical = 10.dp),painter = painterResource(id = tool.resourceID), contentDescription = null, tint =androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer )
+                                Icon(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Transparent)
+                                        .padding(vertical = 10.dp),
+                                    painter = painterResource(id = tool.resourceID),
+                                    contentDescription = null,
+                                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer
+                                )
                                 Text(
                                     text = stringResource(id = tool.toolNameID),
                                     textAlign = TextAlign.Center,
@@ -134,9 +142,10 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
 
                     }
                 }
-                Button(onClick = { onClick(null) }, colors = ButtonDefaults.buttonColors(
-                    backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                )
+                Button(
+                    onClick = { onClick(null) }, colors = ButtonDefaults.buttonColors(
+                        backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.primary
+                    )
                 ) {
                     Text(
                         text = stringResource(id = R.string.start_edit),
@@ -149,13 +158,21 @@ fun MainActivityUI(context:Context,onClick: (Int?) -> Unit) {
             }
             Column {
 
-                TopAppBar (title = {}, backgroundColor = Color.Transparent, elevation = 0.dp, actions = {
-                    IconButton(onClick = {
-                        context.startActivity(Intent(context,SettingActivity::class.java))
-                    }) {
-                        Icon(Icons.Default.Settings,null, tint = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer)
-                    }
-                })
+                TopAppBar(
+                    title = {},
+                    backgroundColor = Color.Transparent,
+                    elevation = 0.dp,
+                    actions = {
+                        IconButton(onClick = {
+                            context.startActivity(Intent(context, SettingActivity::class.java))
+                        }) {
+                            Icon(
+                                Icons.Default.Settings,
+                                null,
+                                tint = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    })
             }
 
         }
@@ -239,7 +256,7 @@ fun AutoSlidingCarousel(
             DotsIndicator(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
                 totalDots = itemsCount,
-                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.targetPage,
+                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.currentPage,
                 dotSize = 8.dp
             )
         }

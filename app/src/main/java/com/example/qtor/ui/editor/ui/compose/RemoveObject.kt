@@ -7,11 +7,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,7 +36,7 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                 EDIT_IMAGE_TOOl -> {
                     RemoveObjectTool(viewModel = viewModel)
                 }
-                FRAME_TOOL ->{
+                FRAME_TOOL -> {
                     FrameTool(viewModel = viewModel)
                 }
                 STICKER_TOOL -> {

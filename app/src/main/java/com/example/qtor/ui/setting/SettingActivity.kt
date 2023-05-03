@@ -7,14 +7,12 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,7 +41,7 @@ class SettingActivity : ComponentActivity() {
                                     LocalContentAlpha provides ContentAlpha.high,
                                 ) {
                                     IconButton(
-                                        onClick = { finish()},
+                                        onClick = { finish() },
                                         enabled = true,
                                     ) {
                                         Icon(
@@ -84,25 +82,33 @@ class SettingActivity : ComponentActivity() {
 //                                id = R.string.ads
 //                            )
 //                        )
-                        SectionSetting(stringResource(id = R.string.sns_channel)){
-                            SectionItem(title = stringResource(id = R.string.instagram), icon = R.drawable.ic_insta) {
+                        SectionSetting(stringResource(id = R.string.sns_channel)) {
+                            SectionItem(
+                                title = stringResource(id = R.string.instagram),
+                                icon = R.drawable.ic_insta
+                            ) {
                                 startActivity(Intent(Intent.ACTION_VIEW).apply {
                                     data = Uri.parse(OWNER_INSTAGRAM)
                                 })
                             }
-                            SectionItem(title = stringResource(id = R.string.tiktok), icon = R.drawable.ic_tiktok
+                            SectionItem(
+                                title = stringResource(id = R.string.tiktok),
+                                icon = R.drawable.ic_tiktok
                             ) {
                                 startActivity(Intent(Intent.ACTION_VIEW).apply {
                                     data = Uri.parse(OWNER_TIKTOK)
                                 })
                             }
-                            SectionItem(title = stringResource(id = R.string.facebook), icon = R.drawable.ic_fb) {
+                            SectionItem(
+                                title = stringResource(id = R.string.facebook),
+                                icon = R.drawable.ic_fb
+                            ) {
                                 startActivity(Intent(Intent.ACTION_VIEW).apply {
                                     data = Uri.parse(OWNER_FACEBOOK)
                                 })
                             }
                         }
-                        SectionSetting(stringResource(id = R.string.support)){
+                        SectionSetting(stringResource(id = R.string.support)) {
                             SectionItem(title = stringResource(id = R.string.contact)) {
                                 sendMail()
                             }
@@ -110,7 +116,7 @@ class SettingActivity : ComponentActivity() {
 
                             }
                         }
-                        SectionSetting(stringResource(id = R.string.other)){
+                        SectionSetting(stringResource(id = R.string.other)) {
                             SectionItem(title = stringResource(id = R.string.app_info)) {
 
                             }
@@ -127,36 +133,58 @@ fun SectionSetting(
     title: String = "Section 1",
     content: @Composable () -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 5.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 5.dp)
+    ) {
         TextButton(onClick = { /*TODO*/ }, enabled = false) {
-            Text(text = title, color = Color.Gray, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+            Text(
+                text = title,
+                color = Color.Gray,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
         }
         content()
     }
 }
 
 @Composable
-fun SectionItem(title: String = "Instagram",icon: Int? =null, onClick: () -> Unit) {
+fun SectionItem(title: String = "Instagram", icon: Int? = null, onClick: () -> Unit) {
     TextButton(
         modifier = Modifier
             .fillMaxWidth(), onClick = { onClick() }
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Row(Modifier.wrapContentWidth(),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                Modifier.wrapContentWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 icon?.let {
-                    Icon(painterResource(id = it), contentDescription =null,
+                    Icon(
+                        painterResource(id = it),
+                        contentDescription = null,
                         Modifier
                             .width(20.dp)
-                            .height(20.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground )
+                            .height(20.dp),
+                        tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                    )
                 }
-                Text(text = title, color =androidx.compose.material3.MaterialTheme.colorScheme.onBackground )
+                Text(
+                    text = title,
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+                )
             }
-            Icon(painterResource(id = R.drawable.ic_forward), contentDescription = null,
+            Icon(
+                painterResource(id = R.drawable.ic_forward),
+                contentDescription = null,
                 Modifier
                     .width(20.dp)
-                    .height(20.dp), tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
+                    .height(20.dp),
+                tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 

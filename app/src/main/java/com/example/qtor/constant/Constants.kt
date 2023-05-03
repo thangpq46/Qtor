@@ -1,9 +1,8 @@
 package com.example.qtor.constant
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
 import com.example.qtor.R
+import com.example.qtor.data.model.FilterObj
 import com.example.qtor.data.model.Language
 import com.example.qtor.data.model.Tool
 
@@ -138,7 +137,7 @@ const val API_KEY =
 const val GOOGLE_URL = "https://www.google.com/"
 const val APP_NAME = "qtor"
 const val FRAME_FOLDER = "frames"
-val FRAME_TITLES= listOf<Int>(
+val FRAME_TITLES = listOf<Int>(
     R.string.frame_1,
     R.string.frame_2,
     R.string.frame_3,
@@ -147,3 +146,70 @@ val FRAME_TITLES= listOf<Int>(
     R.string.frame_6,
     R.string.frame_7
 )
+val Filters = listOf(
+    FilterObj(
+        saturation = 1f,
+        brightness = 1.01f,
+        warmth = 0.5f,
+        contrast = 1f,
+        nameID = R.string.filter_vivid
+    ),
+    FilterObj(
+        saturation = 1.5f,
+        brightness = 1.05f,
+        warmth = 0.96f,
+        contrast = 0.98f,
+        nameID = R.string.filter_playa
+    ),
+    FilterObj(
+        saturation = 0.17863534f,
+        brightness = 1.0995761f,
+        warmth = 1.4455452f,
+        contrast = 1.0975568f,
+        nameID = R.string.filter_honey
+    ),
+    FilterObj(
+        saturation = 1.5727823f,
+        brightness = 0.94126517f,
+        warmth = 0.86413074f,
+        contrast = 1.0673418f,
+        nameID = R.string.filter_isla
+    ),
+    FilterObj(
+        saturation = 1.3461764f,
+        brightness = 0.9895106f,
+        warmth = 1.0229769f,
+        contrast = 1.0500408f,
+        nameID = R.string.filter_desert
+    ),
+    FilterObj(
+        saturation = 1.5031081f,
+        brightness = 0.89285934f,
+        warmth = 0.9459637f,
+        contrast = 1.1156896f,
+        nameID = R.string.filter_clay
+    ),
+    FilterObj(
+        saturation = 1.2f,
+        brightness = 1.1f,
+        warmth = 1.1f,
+        contrast = 1.2f,
+        nameID = R.string.filter_palma
+    ),
+    FilterObj(
+        saturation = 0.9f,
+        brightness = 0.9f,
+        warmth = 0.9f,
+        contrast = 1.2f,
+        nameID = R.string.filter_blush
+    ),
+    FilterObj(
+        saturation = 0.9f,
+        brightness = 0.9f,
+        warmth = 0.8f,
+        contrast = 1.3f,
+        nameID = R.string.filter_alpaca
+    )
+)
+
+const val MAIN_TOOL_FILTER = 3

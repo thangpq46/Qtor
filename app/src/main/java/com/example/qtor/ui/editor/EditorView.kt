@@ -3,9 +3,7 @@ package com.example.qtor.ui.editor
 import android.content.Context
 import android.util.Log
 import android.view.MotionEvent
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
@@ -17,7 +15,6 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
@@ -73,8 +70,8 @@ fun EditorView(
     //icon
     val icDelete =
         context.getDrawable(R.drawable.ic_delete)
-        ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
-        ?.asImageBitmap()
+            ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
+            ?.asImageBitmap()
     val icCopy = context.getDrawable(R.drawable.ic_copy)
         ?.toBitmap(dpToPx(context, 10).toInt(), dpToPx(context, 10).toInt())
         ?.asImageBitmap()
@@ -103,7 +100,6 @@ fun EditorView(
     LaunchedEffect(Pair(saturation, warmth)) {
         viewModel.updateImageMatrix()
     }
-    val filter by viewModel.filter.collectAsState()
 
     val drawColor = MaterialTheme.colors.primary
 
@@ -228,8 +224,7 @@ fun EditorView(
                             )
                         ) {
                             viewModel.removeSticker()
-                        }
-                        else if (isInsideRotatedRect(
+                        } else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -239,8 +234,7 @@ fun EditorView(
                             )
                         ) {
                             viewModel.addSticker(stickers[itemActive])
-                        }
-                        else if (isInsideRotatedRect(
+                        } else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -251,8 +245,7 @@ fun EditorView(
                         ) {
                             found = true
                             viewModel.flipItemActiveHorizontally()
-                        }
-                        else if (isInsideRotatedRect(
+                        } else if (isInsideRotatedRect(
                                 downX / scaleF,
                                 downY / scaleF,
                                 currentItem.rect.centerX(),
@@ -339,13 +332,15 @@ fun EditorView(
                 MAIN_TOOl_REMOVE_OBJECT -> {
                     processActionToolRemove(event)
                 }
-
-                MAIN_TOOL_STICKERS -> {
+                MAIN_TOOL_STICKERS, MAIN_TOOL_FILTER, ADJUST_TOOL, MAIN_TOOL_TEXT -> {
                     processActionToolStickers(event)
                 }
-                MAIN_TOOL_TEXT -> {
-                    processActionToolStickers(event)
-                }
+//                MAIN_TOOL_TEXT -> {
+//                    processActionToolStickers(event)
+//                }
+//                MAIN_TOOL_FILTER, ADJUST_TOOL->{
+//
+//                }
                 else -> {
                     true
                 }
@@ -408,14 +403,6 @@ fun EditorView(
                 drawImage(
                     it,
                     dstOffset = IntOffset.Zero,
-                    dstSize = IntSize(viewWidth, viewHeight)
-                )
-            }
-            filter?.let {
-                drawImage(
-                    it,
-                    dstOffset = IntOffset.Zero,
-                    alpha = FILTER_ALPHA,
                     dstSize = IntSize(viewWidth, viewHeight)
                 )
             }

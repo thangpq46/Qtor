@@ -1,14 +1,24 @@
 package com.example.qtor.util
+
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Typeface
 import androidx.compose.ui.graphics.toArgb
 
-fun createImageBitmapFromText(context: Context,text: String,fontName:String?,textColor:androidx.compose.ui.graphics.Color): Bitmap {
+fun createImageBitmapFromText(
+    context: Context,
+    text: String,
+    fontName: String?,
+    textColor: androidx.compose.ui.graphics.Color
+): Bitmap {
     // Create a new Bitmap with a transparent background
     val paint = Paint().apply {
 
         fontName?.let {
-            this.typeface = Typeface.create(Typeface.createFromAsset(context.assets,fontName), Typeface.NORMAL)
+            this.typeface =
+                Typeface.create(Typeface.createFromAsset(context.assets, fontName), Typeface.NORMAL)
         }
         this.textSize = 200f
         this.color = textColor.toArgb() // Set the text color

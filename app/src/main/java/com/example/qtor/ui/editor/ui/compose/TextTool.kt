@@ -12,10 +12,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -75,7 +73,7 @@ fun TextTool(viewModel: EditorViewModel) {
             ))
         IconButton(modifier = Modifier.weight(1f), onClick = {
             if (text.isNotEmpty()) {
-                viewModel.addText(text, userTextFont, 12f, textColor)
+                viewModel.addText(text, userTextFont, textColor)
                 focusManager.clearFocus()
                 text = ""
             }
@@ -93,7 +91,7 @@ fun TextTool(viewModel: EditorViewModel) {
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.padding(5.dp)
     ) {
-        itemsIndexed(colors) {index,item->
+        itemsIndexed(colors) { index, item ->
             Box(
                 modifier = Modifier
                     .width(25.dp)
@@ -102,12 +100,13 @@ fun TextTool(viewModel: EditorViewModel) {
                     .background(item)
                     .border(
                         BorderStroke(
-                            if (index==colorActive)3.dp else (-1).dp,
+                            if (index == colorActive) 3.dp else (-1).dp,
                             androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                         ), shape = CircleShape
                     )
-                    .clickable { textColor = item
-                    colorActive=index
+                    .clickable {
+                        textColor = item
+                        colorActive = index
                     }
             )
         }

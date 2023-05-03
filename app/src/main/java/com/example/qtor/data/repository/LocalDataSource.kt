@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
 import com.example.qtor.constant.IN_PAINTING_RADIUS
@@ -32,14 +31,6 @@ class LocalDataSource(private val context: Context) : DataSource {
         }
         callback.onLocalLoaded(listStickers)
     }
-
-//    override suspend fun removeObjects(
-//        image: ImageBitmap,
-//        mask: ImageBitmap,
-//        callback: DataSource.RemoveObjectsCallback
-//    ) {
-//        callback.onLocalSuccess(image)
-//    }
 
     override suspend fun cleanupBitmap(
         image: Bitmap,

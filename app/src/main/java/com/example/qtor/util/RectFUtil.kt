@@ -31,6 +31,7 @@ fun RectF.getIntOffset() = IntOffset(this.left.toInt(), this.top.toInt())
 fun getDistance(x1: Float, y1: Float, x2: Float, y2: Float): Float {
     return sqrt(((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)).toDouble()).toFloat()
 }
+
 fun getAngle(pointBefore: PointF, pointAfter: PointF, rotationPoint: PointF): Double {
     return Math.toDegrees(
         atan2(
@@ -45,4 +46,4 @@ fun getAngle(pointBefore: PointF, pointAfter: PointF, rotationPoint: PointF): Do
 
 fun Rect.offset(): Offset = Offset(this.left.toFloat(), this.top.toFloat())
 
-fun Rect.Size(): Size= Size(this.width().toFloat(), this.height().toFloat())
+fun Rect.Size(): Size = Size(this.width().toFloat(), this.height().toFloat())

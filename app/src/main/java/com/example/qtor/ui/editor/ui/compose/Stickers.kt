@@ -20,7 +20,11 @@ import com.example.qtor.data.model.AssetItem
 @Composable
 fun StickersTool(viewModel: EditorViewModel) {
     val stickers = viewModel.assetsStickers
-    LazyRow(modifier = Modifier.height(60.dp), horizontalArrangement = Arrangement.spacedBy(5.dp), verticalAlignment = Alignment.CenterVertically) {
+    LazyRow(
+        modifier = Modifier.height(60.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         items(items = stickers) {
             Sticker(item = it) {
                 viewModel.addSticker(it)
@@ -38,7 +42,8 @@ fun Sticker(item: AssetItem, onClick: () -> Unit) {
             .clickable {
                 onClick()
             }
-            .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
-        , model = Uri.parse(item.url), contentDescription = null
+            .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp)),
+        model = Uri.parse(item.url),
+        contentDescription = null
     )
 }

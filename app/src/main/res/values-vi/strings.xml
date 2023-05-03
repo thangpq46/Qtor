@@ -55,4 +55,13 @@
     <string name="frame_5">Frame5</string>
     <string name="frame_6">Summers</string>
     <string name="frame_7">Winter</string>
+    <string name="filter_vivid">Vivid</string>
+    <string name="filter_playa">Playa</string>
+    <string name="filter_honey">Honey</string>
+    <string name="filter_isla">Isla</string>
+    <string name="filter_desert">Desert</string>
+    <string name="filter_clay">Clay</string>
+    <string name="filter_palma">Palma</string>
+    <string name="filter_blush">Blush</string>
+    <string name="filter_alpaca">Alpaca</string>
 </resources>

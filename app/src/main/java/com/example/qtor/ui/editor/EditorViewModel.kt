@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.ContentValues
 import android.graphics.*
 import android.graphics.Matrix
-
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -13,13 +12,10 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
 import androidx.lifecycle.viewModelScope
 import com.example.qtor.constant.*
@@ -33,7 +29,6 @@ import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
 import com.google.mlkit.vision.segmentation.Segmentation
 import com.google.mlkit.vision.segmentation.selfie.SelfieSegmenterOptions
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,7 +41,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class EditorViewModel(private val application: Application) : BaseViewModel(application) {
-    //    private val repository = ImageRepository(RemoteDataSource(application), LocalDataSource(application))
     private val _imageActions = mutableStateListOf<ImageAction>()
     val imageBitmaps: List<ImageAction> = _imageActions
     private val _stickers = mutableStateListOf<Sticker>()
@@ -72,8 +66,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _rectScale = MutableStateFlow(RectF(ZERO, ZERO, ZERO, ZERO))
     val rectScale: StateFlow<RectF> get() = _rectScale
 
-    private val _filter = MutableStateFlow<ImageBitmap?>(null)
-    val filter: StateFlow<ImageBitmap?> = _filter
     private val _currentBitmapIndex = MutableStateFlow(0)
     val currentBitmapIndex: StateFlow<Int> = _currentBitmapIndex
 
@@ -155,6 +147,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                             obj.boundingBox.width(),
                             obj.boundingBox.height()
                         )
+                        Log.d("AAA", obj.labels.toString())
                         if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
                             list.add(
                                 AITarget(
@@ -220,28 +213,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     val mainToolActive: StateFlow<Int> = _mainToolActive
     internal fun setMainToolActive(index: Int) {
         _mainToolActive.value = index
-    }
-
-    internal fun initStickerS() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getStickers(application, object : DataSource.StickersCallback {
-                override fun onLocalLoaded(stickers: MutableList<Sticker>) {
-                    _stickers.clear()
-                    _stickers.addAll(stickers)
-                }
-
-                override fun onFireBaseLoaded(stickerFB: Sticker) {
-                    if (!_stickers.contains(stickerFB)) {
-                        addSticker(stickerFB)
-                    }
-                }
-
-                override fun onDataNotAvailable() {
-
-                }
-
-            })
-        }
     }
 
     internal fun removeSticker(sticker: Sticker) {
@@ -365,13 +336,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         .enableClassification().setClassificationConfidenceThreshold(0.5f)
         .setMaxPerObjectLabelCount(1).build()
     private val objectDetector = ObjectDetection.getClient(customObjectDetectorOptions)
-
-
-    internal fun selectAIObject(index: Int, aiTarget: AITarget) {
-//        val selected = aiTarget.isSelected
-//        _aiObjects[index] = aiTarget.copy(isSelected = !selected)
-//        addRemoveObjectAction()
-    }
 
     private val dptoPx = application.resources.displayMetrics.density
     private fun getMaskBitmap(path: Path?, obj: AITarget? = null, mode: Int): Bitmap {
@@ -499,9 +463,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _assetsStickers = mutableStateListOf<AssetItem>()
     val assetsStickers: List<AssetItem> = _assetsStickers
 
-    private val _assetsFilters = mutableStateListOf<AssetItem>()
-    val assetsFilters: List<AssetItem> = _assetsFilters
-
     internal fun initAssetData(folderName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val assetManager = getApplication<Application>().assets
@@ -514,9 +475,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             when (folderName) {
                 STORAGE_STICKERS -> {
                     _assetsStickers.addAll(list)
-                }
-                else -> {
-                    _assetsFilters.addAll(list)
                 }
             }
         }
@@ -534,10 +492,12 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                         val top = _editorHeight.value / 2f - bitmap.height / 2
                         val right = left + bitmap.width
                         val bottom = top + bitmap.height
-                        addSticker(Sticker(
-                            RectF(left, top, right, bottom),
-                            bitmap.asImageBitmap()
-                        ))
+                        addSticker(
+                            Sticker(
+                                RectF(left, top, right, bottom),
+                                bitmap.asImageBitmap()
+                            )
+                        )
                         _stateScreen.value = INDILE
                     }
 
@@ -565,29 +525,23 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
-    fun setFilter(asset: AssetItem) {
+    fun setFilter(asset: FilterObj) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
-            repository.getSticker(
-                changeFileEx(asset.name),
-                STORAGE_FILTERS,
-                object : DataSource.StickerLoadCallBack {
-                    override fun onLocalLoad(bitmap: Bitmap) {
-                        _filter.value = bitmap.asImageBitmap()
-                        _stateScreen.value = INDILE
-                    }
-
-                    override fun onFireBaseLoad(bitmap: Bitmap) {
-                        _filter.value = bitmap.asImageBitmap()
-                        _stateScreen.value = INDILE
-                    }
-
-                    override fun onLoadFailed(e: Exception) {
-                        _stateScreen.value = INDILE
-                        //TODO Handle err
-                    }
-
-                })
+            _brightness.update {
+                asset.brightness
+            }
+            _contrast.update {
+                asset.contrast
+            }
+            _warmth.update {
+                asset.warmth
+            }
+            _saturation.update {
+                asset.saturation
+            }
+            updateImageMatrix()
+            _stateScreen.value = INDILE
         }
 
     }
@@ -618,13 +572,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         _brightness.value = process
     }
 
-    private val _brilliance = MutableStateFlow(1f)
-    val brilliance: StateFlow<Float> = _brilliance
-
-    fun setBrilliance(process: Float) {
-        _brilliance.value = (process + FIFTH_TI) / HUREND
-    }
-
     private val _saturation = MutableStateFlow(1f)
     val saturation: StateFlow<Float> = _saturation
     fun setSaturation(process: Float) {
@@ -644,7 +591,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         _warmth.value = temp
     }
 
-    fun addText(text: String, fontName: String?, fontSize: Float, textColor: Color) {
+    fun addText(text: String, fontName: String?, textColor: Color) {
         viewModelScope.launch(Dispatchers.IO) {
             val bitmap = createImageBitmapFromText(application, text, fontName, textColor)
             val left = _editorWidth.value / 2f - bitmap.width / 2
@@ -663,15 +610,21 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     private val _imageMatrix = MutableStateFlow(ImageMatrix())
     val imageMatrix: StateFlow<ImageMatrix> = _imageMatrix
 
-    fun updateImageMatrix(){
+    fun updateImageMatrix() {
         _imageMatrix.value.apply {
             mBrightness = brightness.value
             mContrast = contrast.value
             mSaturation = saturation.value
             mWarmth = warmth.value
             updateMatrix()
+            Log.d("MATRIX", "BRIGHTNESS: $mBrightness")
+            Log.d("MATRIX", "CONTRAST: $mContrast")
+            Log.d("MATRIX", "SATURATION: $mSaturation")
+            Log.d("MATRIX", "WARMTH: $mWarmth")
         }
+
     }
+
     fun saveImage(onSuccess: (Uri) -> Unit, onFailed: () -> Unit) {
         viewModelScope.launch {
             _stateScreen.value = LOADING
@@ -679,20 +632,25 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             val result = ImageBitmap(image.width, image.height, ImageBitmapConfig.Argb8888)
             val canvas = Canvas(result)
             canvas.drawImage(image = image.asImageBitmap(), Offset.Zero, Paint().apply {
-                this.colorFilter= ColorFilter.colorMatrix(ColorMatrix(_imageMatrix.value.mColorMatrix.array))
+                this.colorFilter =
+                    ColorFilter.colorMatrix(ColorMatrix(_imageMatrix.value.mColorMatrix.array))
             })
             val stickerPaint = Paint()
-            val scaleImageoverView = image.width/ _editorWidth.value.toFloat()
-            for ( sticker in _stickers){
+            val scaleImageoverView = image.width / _editorWidth.value.toFloat()
+            for (sticker in _stickers) {
                 canvas.save()
-                canvas.rotate(sticker.angle,sticker.rect.centerX()*scaleImageoverView,sticker.rect.centerY()*scaleImageoverView)
-                canvas.drawImageRect( sticker.bitmap,dstOffset=(sticker.rect.offset()*scaleImageoverView).round(), dstSize = (sticker.rect.getSize()*scaleImageoverView).toIntSize(), paint = stickerPaint)
+                canvas.rotate(
+                    sticker.angle,
+                    sticker.rect.centerX() * scaleImageoverView,
+                    sticker.rect.centerY() * scaleImageoverView
+                )
+                canvas.drawImageRect(
+                    sticker.bitmap,
+                    dstOffset = (sticker.rect.offset() * scaleImageoverView).round(),
+                    dstSize = (sticker.rect.getSize() * scaleImageoverView).toIntSize(),
+                    paint = stickerPaint
+                )
                 canvas.restore()
-            }
-            _filter.value?.let {
-                canvas.drawImageRect(it, dstOffset = IntOffset.Zero, dstSize = IntSize(image.width,image.height), paint = stickerPaint.apply {
-                    alpha=FILTER_ALPHA
-                })
             }
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             val current = LocalDateTime.now().format(formatter)
@@ -712,7 +670,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             try {
                 application.contentResolver.insert(imageCollection, content)?.also {
                     application.contentResolver.openOutputStream(it).use { os ->
-                        if (!result.asAndroidBitmap() .compress(Bitmap.CompressFormat.JPEG, 100, os)) {
+                        if (!result.asAndroidBitmap()
+                                .compress(Bitmap.CompressFormat.JPEG, 100, os)
+                        ) {
                             throw IOException("Failed to save BMP")
                         } else {
                             viewModelScope.launch(Dispatchers.Main) {
@@ -740,11 +700,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     private val _frames = mutableStateListOf<List<AssetItem>>()
-    val frames : List<List<AssetItem>>  = _frames
+    val frames: List<List<AssetItem>> = _frames
 
     private val _frameContainerActive = MutableStateFlow(-1)
-    val frameContainerActive : StateFlow<Int> = _frameContainerActive
-    fun initFrames(){
+    val frameContainerActive: StateFlow<Int> = _frameContainerActive
+    fun initFrames() {
         viewModelScope.launch(Dispatchers.IO) {
             val assetManager = getApplication<Application>().assets
             val fileList = assetManager.list(FRAME_FOLDER) ?: return@launch
@@ -768,40 +728,48 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         }
     }
 
-    fun setFrameContainerActive (index: Int){
+    fun setFrameContainerActive(index: Int) {
         _frameContainerActive.update {
             index
         }
     }
+
     private val _frame = MutableStateFlow<ImageBitmap?>(null)
-    val frame : StateFlow<ImageBitmap?> = _frame
-    fun setFrame(asset: AssetItem) {
+    val frame: StateFlow<ImageBitmap?> = _frame
+    fun setFrame(asset: AssetItem?) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
-            repository.getSticker(
-                changeFileEx(asset.name),
-                STORAGE_FRAMES,
-                object : DataSource.StickerLoadCallBack {
-                    override fun onLocalLoad(bitmap: Bitmap) {
-                        _frame.update {
-                            bitmap.asImageBitmap()
+            if (asset != null) {
+                repository.getSticker(
+                    changeFileEx(asset.name),
+                    STORAGE_FRAMES,
+                    object : DataSource.StickerLoadCallBack {
+                        override fun onLocalLoad(bitmap: Bitmap) {
+                            _frame.update {
+                                bitmap.asImageBitmap()
+                            }
+                            _stateScreen.value = INDILE
                         }
-                        _stateScreen.value = INDILE
-                    }
 
-                    override fun onFireBaseLoad(bitmap: Bitmap) {
-                        _frame.update {
-                            bitmap.asImageBitmap()
+                        override fun onFireBaseLoad(bitmap: Bitmap) {
+                            _frame.update {
+                                bitmap.asImageBitmap()
+                            }
+                            _stateScreen.value = INDILE
                         }
-                        _stateScreen.value = INDILE
-                    }
 
-                    override fun onLoadFailed(e: Exception) {
-                        _stateScreen.value = INDILE
-                        //TODO Handle err
-                    }
+                        override fun onLoadFailed(e: Exception) {
+                            _stateScreen.value = INDILE
+                            //TODO Handle err
+                        }
 
-                })
+                    })
+            } else {
+                _frame.update {
+                    null
+                }
+                _stateScreen.value = INDILE
+            }
         }
 
     }

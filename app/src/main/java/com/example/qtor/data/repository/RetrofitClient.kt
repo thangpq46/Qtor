@@ -1,7 +1,6 @@
 package com.example.qtor.data.repository
 
 import com.example.qtor.constant.BASE_URL
-import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 

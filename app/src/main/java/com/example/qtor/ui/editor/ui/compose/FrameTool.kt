@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,40 +44,53 @@ fun FrameTool(viewModel: EditorViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = { viewModel.setMainToolActive(-1) }, shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colorScheme.onBackground,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ), elevation = ButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    hoveredElevation = 0.dp
-                )
+                Button(
+                    onClick = {
+                        viewModel.setMainToolActive(-1)
+                        viewModel.setFrame(null)
+
+                    }, shape = CircleShape, colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colorScheme.onBackground,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ), elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        hoveredElevation = 0.dp
+                    )
                 ) {
                     Icon(Icons.Default.Close, contentDescription = null)
                 }
-                Button(onClick = { viewModel.setMainToolActive(-1) }, shape = CircleShape, colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colorScheme.onBackground,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ), elevation = ButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp,
-                    hoveredElevation = 0.dp
-                )) {
+                Button(
+                    onClick = { viewModel.setMainToolActive(-1) },
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = MaterialTheme.colorScheme.onBackground,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    elevation = ButtonDefaults.elevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp,
+                        hoveredElevation = 0.dp
+                    )
+                ) {
                     Icon(Icons.Default.Check, contentDescription = null)
                 }
             }
             LazyRow {
-                itemsIndexed(items = FRAME_TITLES) { index,it->
-                    TextButton(onClick = {viewModel.setFrameContainerActive(index) } ) {
-                        Text(text = stringResource(id = it), color = MaterialTheme.colorScheme.onSecondary)
+                itemsIndexed(items = FRAME_TITLES) { index, it ->
+                    TextButton(onClick = { viewModel.setFrameContainerActive(index) }) {
+                        Text(
+                            text = stringResource(id = it),
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
                     }
                 }
             }
-            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 100.dp)){
-                if (containerActive in frames.indices){
+            LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 100.dp)) {
+                if (containerActive in frames.indices) {
                     items(items = frames[containerActive]) {
                         TextButton(onClick = { /*TODO*/ }) {
-                            Frame(it,viewModel::setFrame)
+                            Frame(it, viewModel::setFrame)
                         }
                     }
                 }
@@ -96,7 +108,8 @@ fun Frame(item: AssetItem, onClick: KFunction1<AssetItem, Unit>) {
             .clickable {
                 onClick(item)
             }
-            .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp))
-        , model = Uri.parse(item.url), contentDescription = null
+            .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(5.dp)),
+        model = Uri.parse(item.url),
+        contentDescription = null
     )
 }
