@@ -24,6 +24,7 @@ import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
 import com.example.qtor.ui.editor.ui.compose.FrameTool
+import com.example.qtor.ui.editor.ui.compose.TimeStampCompose
 import kotlin.reflect.KFunction1
 
 
@@ -37,7 +38,7 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                     RemoveObjectTool(viewModel = viewModel)
                 }
                 FRAME_TOOL -> {
-                    FrameTool(viewModel = viewModel)
+
                 }
                 STICKER_TOOL -> {
                     StickersTool(viewModel = viewModel)
@@ -50,6 +51,9 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                 }
                 ADJUST_TOOL -> {
                     AdjustColorTools(viewModel = viewModel)
+                }
+                MAIN_TOOL_TIMESTAMP->{
+                    TimeStampCompose(viewModel)
                 }
             }
             Divider(
@@ -104,8 +108,6 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
         }
         BottomNavigation(
             modifier = modifier,
-//            backgroundColor = MaterialTheme.colors.onBackground,
-//            contentColor = MaterialTheme.colors.onBackground
         ) {
             bottomMenuItemsList.forEachIndexed { index, item ->
                 BottomNavigationItem(

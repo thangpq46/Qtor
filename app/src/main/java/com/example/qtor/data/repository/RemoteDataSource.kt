@@ -44,7 +44,7 @@ class RemoteDataSource(private val context: Context) : DataSource {
                     callback.onFireBaseLoaded(
                         Sticker(
                             bitmap = bit,
-                            rect = RectF(0f, 0f, bit.width.toFloat(), bit.height.toFloat())
+                            rectF = RectF(0f, 0f, bit.width.toFloat(), bit.height.toFloat())
                         )
                     )
                 }.addOnFailureListener {

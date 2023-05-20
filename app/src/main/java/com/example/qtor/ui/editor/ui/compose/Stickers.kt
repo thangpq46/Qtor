@@ -26,7 +26,7 @@ fun StickersTool(viewModel: EditorViewModel) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         items(items = stickers) {
-            Sticker(item = it) {
+            StickerCompose(item = it) {
                 viewModel.addSticker(it)
             }
         }
@@ -34,7 +34,7 @@ fun StickersTool(viewModel: EditorViewModel) {
 }
 
 @Composable
-fun Sticker(item: AssetItem, onClick: () -> Unit) {
+fun StickerCompose(item: AssetItem, onClick: () -> Unit) {
     AsyncImage(
         modifier = Modifier
             .width(50.dp)

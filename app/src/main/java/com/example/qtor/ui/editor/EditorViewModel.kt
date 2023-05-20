@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -14,7 +15,19 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Canvas
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageBitmapConfig
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.PaintingStyle
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.rotate
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
@@ -23,11 +36,47 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.qtor.R
-import com.example.qtor.constant.*
-import com.example.qtor.data.model.*
+import com.example.qtor.constant.APP_NAME
+import com.example.qtor.constant.ASSET_PATH
+import com.example.qtor.constant.BLUR
+import com.example.qtor.constant.BRUSH_MODE
+import com.example.qtor.constant.CANNY_THRESHOLD_1
+import com.example.qtor.constant.CANNY_THRESHOLD_2
+import com.example.qtor.constant.FRAME_FOLDER
+import com.example.qtor.constant.INDILE
+import com.example.qtor.constant.ITEM_ACTIVE_NULL
+import com.example.qtor.constant.LABEL_PERSON
+import com.example.qtor.constant.LOADING
+import com.example.qtor.constant.LOCAL_MODEL_FILE_PATH
+import com.example.qtor.constant.NEW_EXTENSION
+import com.example.qtor.constant.OLD_EXTENSION
+import com.example.qtor.constant.PERCENT_INCREASE_HEIGHT_AI_PEOPLE
+import com.example.qtor.constant.RECT_ITEM_EDIT_SIZE
+import com.example.qtor.constant.STORAGE_FONTS
+import com.example.qtor.constant.STORAGE_FRAMES
+import com.example.qtor.constant.STORAGE_STICKERS
+import com.example.qtor.constant.TYPE_OTHERS
+import com.example.qtor.constant.TYPE_PEOPLE
+import com.example.qtor.constant.ZERO
+import com.example.qtor.data.model.AITarget
+import com.example.qtor.data.model.AssetItem
+import com.example.qtor.data.model.FilterObj
+import com.example.qtor.data.model.Font
+import com.example.qtor.data.model.ImageAction
+import com.example.qtor.data.model.Sticker
+import com.example.qtor.data.model.TimeStamp
 import com.example.qtor.data.repository.DataSource
 import com.example.qtor.ui.base.BaseViewModel
-import com.example.qtor.util.*
+import com.example.qtor.util.SharpenImageFilter
+import com.example.qtor.util.convexHull
+import com.example.qtor.util.createImageBitmapFromText
+import com.example.qtor.util.dpToPx
+import com.example.qtor.util.getAngle
+import com.example.qtor.util.getDistance
+import com.example.qtor.util.getSize
+import com.example.qtor.util.move
+import com.example.qtor.util.offset
+import com.example.qtor.util.toIntSize
 import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.ObjectDetection
@@ -85,8 +134,12 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     val drawY: StateFlow<Float> = _drawY
 
     fun moveImage(x: Float, y: Float) {
-        _drawX.value += x
-        _drawY.value += y
+        _drawX.update {
+            it + x
+        }
+        _drawY.update {
+            it + y
+        }
     }
 
     private val _scaleF = MutableStateFlow(1f)
@@ -152,7 +205,6 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                     )
 
 
-
                                     val origin = Bitmap.createBitmap(
                                         scaleBitmap,
                                         obj.boundingBox.left,
@@ -162,14 +214,14 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                     )
                                     Log.d("AAA", obj.labels.toString())
 //                                    if (obj.labels.size > 0 && obj.labels[0].text == LABEL_PERSON) {
-                                        list.add(
-                                            AITarget(
-                                                obj.boundingBox,
-                                                maskPeopleObj.asImageBitmap(),
-                                                origin.asImageBitmap(),
-                                                TYPE_PEOPLE
-                                            )
+                                    list.add(
+                                        AITarget(
+                                            obj.boundingBox,
+                                            maskPeopleObj.asImageBitmap(),
+                                            origin.asImageBitmap(),
+                                            TYPE_PEOPLE
                                         )
+                                    )
 //                                    } else {
 //                                        list.add(
 //                                            AITarget(
@@ -180,7 +232,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 //                                            )
 //                                        )
 //                                    }
-                                }else{
+                                } else {
                                     val origin = Bitmap.createBitmap(
                                         scaleBitmap,
                                         obj.boundingBox.left,
@@ -258,8 +310,9 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                     val canvas = android.graphics.Canvas(maskOthersObj)
 //                                    canvas.drawColor(android.graphics.Color.WHITE)
                                     canvas.drawPath(contourOjb, android.graphics.Paint().apply {
-                                        color=android.graphics.Color.WHITE
-                                        style=android.graphics.Paint.Style.FILL
+                                        this.strokeWidth = 25f
+                                        color = android.graphics.Color.WHITE
+                                        style = android.graphics.Paint.Style.FILL_AND_STROKE
                                     })
                                     list.add(
                                         AITarget(
@@ -294,7 +347,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     }
 
     private val _selectedObj = MutableStateFlow<AITarget?>(null)
-    val selectedObj :StateFlow<AITarget?> = _selectedObj
+    val selectedObj: StateFlow<AITarget?> = _selectedObj
 
     internal fun addSticker(sticker: Sticker) {
         val rect = RectF(sticker.rect)
@@ -307,6 +360,14 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     fun moveSticker(index: Int, moveX: Float, moveY: Float) {
         val a = _stickers.toMutableList().apply {
             this[index].rect.move(moveX, moveY)
+        }
+        _stickers.clear()
+        _stickers.addAll(a)
+    }
+
+    fun moveSticker(index: Int, offset: Offset) {
+        val a = _stickers.toMutableList().apply {
+            this[index].rect.move(offset)
         }
         _stickers.clear()
         _stickers.addAll(a)
@@ -418,6 +479,22 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         _stickers.addAll(a)
     }
 
+    internal fun tranformItemActive(scaleFactor: Float, rotation: Float, offset: Offset) {
+        val rectActive = _stickers[_itemActive.value].rect
+        val angle = _stickers[_itemActive.value].angle + rotation
+        rectActive.move(offset)
+        matrixScale.setScale(
+            scaleFactor, scaleFactor, rectActive.centerX(), rectActive.centerY()
+        )
+        matrixScale.mapRect(rectActive)
+        val temp = _stickers.toMutableList().apply {
+            set(_itemActive.value, this[_itemActive.value].copy(rect = rectActive, angle = angle))
+        }
+        _stickers.clear()
+        _stickers.addAll(temp)
+        updateStickerEx()
+    }
+
     private val _removeObjectToolActive = MutableStateFlow(BRUSH_MODE)
     val removeObjectToolActive: StateFlow<Int> = _removeObjectToolActive
 
@@ -486,7 +563,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
-            obj?.let {objSelected->
+            obj?.let { objSelected ->
                 _selectedObj.update {
                     objSelected
                 }
@@ -510,7 +587,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
                                 }
                             })
                     )
-                    obj?.let {objSelected->
+                    obj?.let { objSelected ->
                         _selectedObj.update {
                             null
                         }
@@ -646,6 +723,16 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
+    fun addSticker(timeStamp: TimeStamp) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val left = _editorWidth.value / 2f - timeStamp.bitmap.width / 2
+            val top = _editorHeight.value / 2f - timeStamp.bitmap.height / 2
+            val right = left + timeStamp.bitmap.width
+            val bottom = top + timeStamp.bitmap.height
+            addSticker(timeStamp.copy(RectF(left, top, right, bottom)) as Sticker)
+        }
+    }
+
     fun setFilter(asset: FilterObj) {
         viewModelScope.launch(Dispatchers.IO) {
             _stateScreen.value = LOADING
@@ -721,7 +808,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             val bottom = top + bitmap.height
             addSticker(
                 Sticker(
-                    RectF(left, top, right, bottom),
+                    rectF =  RectF(left, top, right, bottom),
                     bitmap.asImageBitmap()
                 )
             )
@@ -903,4 +990,106 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
+    private val _timeStamps = mutableStateListOf<TimeStamp>()
+    val timeStamps: List<TimeStamp> = _timeStamps
+
+    fun initTimeStamps() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val asset = application.assets
+            _timeStamps.clear()
+            _timeStamps.addAll(
+                listOf(
+                    TimeStamp(application, paintSecondLine = android.graphics.Paint().apply {
+                        textSize = 100f
+                        typeface = Typeface.createFromAsset(asset, "fonts/DripOctober-vm0JA.ttf")
+                        color = Color.White.toArgb()
+                    }, paintFirstLine = android.graphics.Paint().apply {
+                        textSize = 230f
+                        typeface = Typeface.createFromAsset(asset, "fonts/Choret.ttf")
+                        color = Color.White.toArgb()
+                    }, padding = 28f),
+                    TimeStamp(
+                        application,
+                        paintSecondLine = android.graphics.Paint().apply {
+                            textSize = 130f
+                            typeface = Typeface.createFromAsset(asset, "fonts/Chanrest.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        paintFirstLine = android.graphics.Paint().apply {
+                            textSize = 250f
+                            typeface =
+                                Typeface.createFromAsset(asset, "fonts/AlexanderLettering-5MEj.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        padding = 28f,
+                        formatterFirstLine = DateTimeFormatter.ofPattern("EEEE"),
+                        lineSpacing = 40f
+                    ), TimeStamp(
+                        application,
+                        formatterSecondLine = DateTimeFormatter.ofPattern("EE"),
+                        paintSecondLine = android.graphics.Paint(),
+                        paintFirstLine = android.graphics.Paint().apply {
+                            textSize = 130f
+                            typeface = Typeface.createFromAsset(asset, "fonts/Butterfly.ttf")
+                            color = Color.White.toArgb()
+                            this.letterSpacing = 0.06f
+                        },
+                        padding = 28f,
+                        formatterFirstLine = DateTimeFormatter.ofPattern("yyyy.MM.dd"),
+                        lineSpacing = 40f,
+                        singleLine = true
+                    ),
+                    TimeStamp(
+                        application,
+                        paintSecondLine = android.graphics.Paint().apply {
+                            textSize = 220f
+                            typeface = Typeface.createFromAsset(asset, "fonts/Digital Dismay.otf")
+                            color = Color.White.toArgb()
+                        },
+                        paintFirstLine = android.graphics.Paint().apply {
+                            textSize = 250f
+                            typeface =
+                                Typeface.createFromAsset(asset, "fonts/AlexanderLettering-5MEj.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        padding = 28f,
+                        formatterFirstLine = DateTimeFormatter.ofPattern("EEEE"),
+                        formatterSecondLine = DateTimeFormatter.ofPattern("HH:mm"),
+                        lineSpacing = 30f
+                    ),
+                    TimeStamp(
+                        application,
+                        paintSecondLine = android.graphics.Paint(),
+                        paintFirstLine = android.graphics.Paint().apply {
+                            textSize = 500f
+                            typeface = Typeface.createFromAsset(asset, "fonts/Orloj.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        padding = 28f,
+                        formatterFirstLine = DateTimeFormatter.ofPattern("HH:mm"),
+                        lineSpacing = 30f,
+                        singleLine = true
+                    ),
+                    TimeStamp(
+                        application,
+                        paintSecondLine = android.graphics.Paint().apply {
+                            textSize = 180f
+                            typeface =
+                                Typeface.createFromAsset(asset, "fonts/DripOctober-vm0JA.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        paintFirstLine = android.graphics.Paint().apply {
+                            textSize = 200f
+                            typeface = Typeface.createFromAsset(asset, "fonts/LmsAIsForAngel.ttf")
+                            color = Color.White.toArgb()
+                        },
+                        padding = 28f,
+                        formatterFirstLine = DateTimeFormatter.ofPattern("EEEE"),
+                        formatterSecondLine = DateTimeFormatter.ofPattern("yyyy.MM.dd"),
+                        lineSpacing = 30f
+                    )
+                )
+            )
+        }
+    }
 }

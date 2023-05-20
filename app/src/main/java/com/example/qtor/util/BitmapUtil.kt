@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Typeface
+import android.util.TypedValue
 import androidx.compose.ui.graphics.toArgb
 
 fun createImageBitmapFromText(
@@ -38,4 +39,12 @@ fun createImageBitmapFromText(
 
     // Convert the Bitmap to an ImageBitmap and return it
     return bitmap
+}
+
+fun dpToPx(context: Context, dp: Float): Float {
+    return TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        dp,
+        context.resources.displayMetrics
+    )
 }
