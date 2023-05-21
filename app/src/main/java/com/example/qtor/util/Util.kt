@@ -10,6 +10,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.example.qtor.data.model.Sticker
 import com.example.qtor.data.repository.RetrofitClient
 import java.io.File
 import java.io.IOException
@@ -132,4 +133,11 @@ private fun ccw(a: org.opencv.core.Point, b: org.opencv.core.Point, c: org.openc
 
     h.removeAt(h.lastIndex)
     return h
+}
+
+fun Sticker.contains(downX: Float, downY: Float): Boolean {
+    if (downX >= this.rect.left && downX <= this.rect.right && downY >= this.rect.top && downY <= this.rect.bottom) {
+        return true
+    }
+    return false
 }

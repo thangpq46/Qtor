@@ -28,9 +28,3 @@ open class Sticker(
     }
 }
 
-fun Sticker.contains(downX: Float, downY: Float): Boolean {
-    if (downX >= this.rect.left && downX <= this.rect.right && downY >= this.rect.top && downY <= this.rect.bottom) {
-        return true
-    }
-    return false
-}

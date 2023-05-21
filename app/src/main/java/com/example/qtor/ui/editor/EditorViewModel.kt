@@ -350,11 +350,13 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     val selectedObj: StateFlow<AITarget?> = _selectedObj
 
     internal fun addSticker(sticker: Sticker) {
-        val rect = RectF(sticker.rect)
-        rect.move(dpToPx(application, 15), dpToPx(application, 15))
-        _stickers.add(sticker.copy(rect = rect))
-        setStickerActive(_stickers.lastIndex)
-        updateStickerEx()
+        viewModelScope.launch(Dispatchers.IO) {
+            val rect = RectF(sticker.rect)
+            rect.move(dpToPx(application, 15), dpToPx(application, 15))
+            _stickers.add(sticker.copy(rect = rect))
+            setStickerActive(_stickers.lastIndex)
+            updateStickerEx()
+        }
     }
 
     fun moveSticker(index: Int, moveX: Float, moveY: Float) {
@@ -723,13 +725,15 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     }
 
-    fun addSticker(timeStamp: TimeStamp) {
+    fun addTimeStamp(timeStamp: TimeStamp) {
         viewModelScope.launch(Dispatchers.IO) {
             val left = _editorWidth.value / 2f - timeStamp.bitmap.width / 2
             val top = _editorHeight.value / 2f - timeStamp.bitmap.height / 2
             val right = left + timeStamp.bitmap.width
             val bottom = top + timeStamp.bitmap.height
-            addSticker(timeStamp.copy(RectF(left, top, right, bottom)) as Sticker)
+            _stickers.add(timeStamp.copy(RectF(left, top, right, bottom)))
+            setStickerActive(_stickers.lastIndex)
+            updateStickerEx()
         }
     }
 
@@ -1092,4 +1096,19 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             )
         }
     }
+    fun setTimeTimeStamp(time: LocalDateTime= LocalDateTime.now()){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is TimeStamp) {
+                    sticker.updateTime(time)
+                    _stickers[itemActive.value] = sticker
+                }
+//            this[index].rect.move(moveX, moveY)
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+
 }
