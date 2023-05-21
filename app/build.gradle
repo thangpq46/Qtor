@@ -75,10 +75,15 @@ dependencies {
     implementation 'com.google.mlkit:object-detection-custom:17.0.0'
     implementation 'com.quickbirdstudios:opencv-contrib:3.4.15'
     implementation("io.coil-kt:coil-compose:2.3.0")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.google.code.gson:gson:2.10.1")
-    implementation ("com.google.accompanist:accompanist-pager:0.25.1")
-    implementation ("com.google.accompanist:accompanist-permissions:0.23.1")
-    implementation ("androidx.compose.material3:material3:1.1.0-beta02")
-    implementation ("com.github.bumptech.glide:glide:4.14.2")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.accompanist:accompanist-pager:0.25.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.23.1")
+    implementation("androidx.compose.material3:material3:1.1.0-beta02")
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:calendar:1.1.1")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:core:1.1.1")
+    implementation ("com.maxkeppeler.sheets-compose-dialogs:clock:1.1.1")
+
+
 }

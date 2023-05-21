@@ -1,5 +1,6 @@
 package com.example.qtor.ui.editor.ui.compose
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,17 +18,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.qtor.data.model.TimeStamp
 import com.example.qtor.ui.editor.EditorViewModel
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimeStampCompose(viewModel: EditorViewModel){
+
+    val calendarState = rememberUseCaseState()
+    CalendarDialog(state =calendarState,
+        config = CalendarConfig(monthSelection = true, yearSelection = true)
+        , selection = CalendarSelection.Date{
+        Log.d("AHIHI",it.toString())
+//        viewModel.setTimeTimeStamp(it.)
+    })
     Button(onClick = { viewModel.setTimeTimeStamp() }) {
         Text(text = "Current Time")
     }
     Button(onClick = { viewModel.setTimeTimeStamp(LocalDateTime.of(2001,6,4,4,20)) }) {
         Text(text = "Taken Time")
     }
-    Button(onClick = { /*TODO*/ }) {
+    Button(onClick = { calendarState.show() }) {
         Text(text = "Pick")
     }
     LazyRow(modifier = Modifier
