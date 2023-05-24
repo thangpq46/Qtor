@@ -6,16 +6,22 @@ import androidx.compose.ui.graphics.ImageBitmapConfig
 
 open class Sticker(
 ) {
-     var rect: RectF = RectF()
-    var bitmap: ImageBitmap = ImageBitmap(1,1, ImageBitmapConfig.Argb8888)
+    var rect: RectF = RectF()
+    var bitmap: ImageBitmap = ImageBitmap(1, 1, ImageBitmapConfig.Argb8888)
     var angle: Float = 0f
     var scale: Float = 1f
+    var stickerType : StickerType = StickerType.NORMAL
 
-    constructor(rectF: RectF= RectF(), bitmap: ImageBitmap, angle:Float=0f, scale:Float=1f) : this() {
-        this.rect=rectF
-        this.bitmap=bitmap
-        this.angle=angle
-        this.scale=scale
+    constructor(
+        rectF: RectF = RectF(),
+        bitmap: ImageBitmap,
+        angle: Float = 0f,
+        scale: Float = 1f
+    ) : this() {
+        this.rect = rectF
+        this.bitmap = bitmap
+        this.angle = angle
+        this.scale = scale
     }
 
 
@@ -23,8 +29,17 @@ open class Sticker(
         val a = other as Sticker
         return rect == a.rect && angle == a.angle
     }
-    open fun copy(rect: RectF=this.rect,bitmap: ImageBitmap=this.bitmap,angle:Float=this.angle,scale:Float=this.scale):Sticker{
-        return Sticker(RectF(rect), bitmap,angle,scale )
+
+    open fun copy(
+        rect: RectF = this.rect,
+        bitmap: ImageBitmap = this.bitmap,
+        angle: Float = this.angle,
+        scale: Float = this.scale
+    ): Sticker {
+        return Sticker(RectF(rect), bitmap, angle, scale)
     }
 }
 
+enum class StickerType {
+    NORMAL, TIMESTAMP, TEXT
+}

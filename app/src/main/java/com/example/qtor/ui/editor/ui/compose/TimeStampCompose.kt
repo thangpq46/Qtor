@@ -13,6 +13,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,6 +35,7 @@ fun TimeStampCompose(viewModel: EditorViewModel){
 
     val calendarState = rememberUseCaseState()
     val timeState = rememberUseCaseState()
+    val timeStampInActive by viewModel.timeStampInActive.collectAsState()
     CalendarDialog(state =calendarState,
         config = CalendarConfig(monthSelection = true, yearSelection = true)
         , selection = CalendarSelection.Date{
@@ -44,16 +47,16 @@ fun TimeStampCompose(viewModel: EditorViewModel){
         Log.d("AHIHI","$hours:$minutes")
         viewModel.updateTime(hours,minutes)
     } )
-    Button(onClick = { viewModel.setTimeTimeStamp() }) {
+    Button(onClick = { viewModel.setTimeTimeStamp() }, enabled = timeStampInActive) {
         Text(text = "Current Time")
     }
-    Button(onClick = { viewModel.setTimeTimeStamp(LocalDateTime.of(2001,6,4,4,20)) }) {
+    Button(onClick = { viewModel.setTimeTimeStamp(LocalDateTime.of(2001,6,4,4,20)) }, enabled = timeStampInActive) {
         Text(text = "Taken Time")
     }
-    Button(onClick = { calendarState.show() }) {
+    Button(onClick = { calendarState.show() }, enabled = timeStampInActive) {
         Text(text = "Pick")
     }
-    Button(onClick = { timeState.show() }) {
+    Button(onClick = { timeState.show() }, enabled = timeStampInActive) {
         Text(text = "Pick")
     }
     LazyRow(modifier = Modifier

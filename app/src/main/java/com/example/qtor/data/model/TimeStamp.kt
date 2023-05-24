@@ -28,6 +28,7 @@ class TimeStamp(
     private var canvas: androidx.compose.ui.graphics.Canvas
 
     init {
+        stickerType=StickerType.TIMESTAMP
         val strFirstLine = time.format(formatterFirstLine)
         val strSecondLine = time.format(formatterSecondLine)
         if (singleLine) {

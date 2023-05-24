@@ -64,6 +64,7 @@ import com.example.qtor.data.model.FilterObj
 import com.example.qtor.data.model.Font
 import com.example.qtor.data.model.ImageAction
 import com.example.qtor.data.model.Sticker
+import com.example.qtor.data.model.StickerType
 import com.example.qtor.data.model.TimeStamp
 import com.example.qtor.data.repository.DataSource
 import com.example.qtor.ui.base.BaseViewModel
@@ -380,6 +381,15 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
     val itemActive: StateFlow<Int> = _itemActive
     internal fun setStickerActive(index: Int) {
         _itemActive.value = index
+        if (_itemActive.value!= ITEM_ACTIVE_NULL && _stickers[itemActive.value].stickerType==StickerType.TIMESTAMP){
+            _timeStampInActive.update {
+                true
+            }
+        }else{
+            _timeStampInActive.update {
+                false
+            }
+        }
     }
 
     internal fun removeSticker() {
@@ -1143,5 +1153,4 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _timeStampInActive = MutableStateFlow(false)
     val timeStampInActive : StateFlow<Boolean> = _timeStampInActive
-
 }
