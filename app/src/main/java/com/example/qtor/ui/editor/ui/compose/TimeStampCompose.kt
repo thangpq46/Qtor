@@ -22,6 +22,8 @@ import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockSelection
 
 import java.time.LocalDateTime
 
@@ -30,12 +32,18 @@ import java.time.LocalDateTime
 fun TimeStampCompose(viewModel: EditorViewModel){
 
     val calendarState = rememberUseCaseState()
+    val timeState = rememberUseCaseState()
     CalendarDialog(state =calendarState,
         config = CalendarConfig(monthSelection = true, yearSelection = true)
         , selection = CalendarSelection.Date{
         Log.d("AHIHI",it.toString())
+            viewModel.updateDate(it)
 //        viewModel.setTimeTimeStamp(it.)
     })
+    ClockDialog(state = timeState , selection = ClockSelection.HoursMinutes{ hours, minutes ->
+        Log.d("AHIHI","$hours:$minutes")
+        viewModel.updateTime(hours,minutes)
+    } )
     Button(onClick = { viewModel.setTimeTimeStamp() }) {
         Text(text = "Current Time")
     }
@@ -43,6 +51,9 @@ fun TimeStampCompose(viewModel: EditorViewModel){
         Text(text = "Taken Time")
     }
     Button(onClick = { calendarState.show() }) {
+        Text(text = "Pick")
+    }
+    Button(onClick = { timeState.show() }) {
         Text(text = "Pick")
     }
     LazyRow(modifier = Modifier

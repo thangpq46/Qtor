@@ -96,6 +96,7 @@ import org.opencv.core.MatOfPoint
 import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
 import java.io.IOException
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -1101,7 +1102,7 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             val a = _stickers.toMutableList().apply {
                 val sticker = this[_itemActive.value]
                 if (sticker is TimeStamp) {
-                    sticker.updateTime(time)
+                    sticker.updateDateTime(time)
                     _stickers[itemActive.value] = sticker
                 }
 //            this[index].rect.move(moveX, moveY)
@@ -1110,5 +1111,37 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             _stickers.addAll(a)
         }
     }
+
+    fun updateDate(date:LocalDate){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is TimeStamp) {
+                    sticker.updateDate(date)
+                    _stickers[itemActive.value] = sticker
+                }
+//            this[index].rect.move(moveX, moveY)
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+
+    fun updateTime(hours: Int, minutes: Int){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is TimeStamp) {
+                    sticker.updateTime(hours,minutes)
+                    _stickers[itemActive.value] = sticker
+                }
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+
+    private val _timeStampInActive = MutableStateFlow(false)
+    val timeStampInActive : StateFlow<Boolean> = _timeStampInActive
 
 }
