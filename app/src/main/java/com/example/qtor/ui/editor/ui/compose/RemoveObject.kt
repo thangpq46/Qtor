@@ -1,11 +1,29 @@
 package com.example.qtor.ui.editor
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
@@ -21,10 +39,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.qtor.constant.*
+import com.example.qtor.constant.ADJUST_TOOL
+import com.example.qtor.constant.DETECT_OBJECT_MODE
+import com.example.qtor.constant.EDIT_IMAGE_TOOl
+import com.example.qtor.constant.FILTERS_TOOl
+import com.example.qtor.constant.FRAME_TOOL
+import com.example.qtor.constant.MAIN_TOOL_TIMESTAMP
+import com.example.qtor.constant.STICKER_TOOL
+import com.example.qtor.constant.TEXT_TOOL
+import com.example.qtor.constant.tools
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
-import com.example.qtor.ui.editor.ui.compose.FrameTool
 import com.example.qtor.ui.editor.ui.compose.TextTools
 import com.example.qtor.ui.editor.ui.compose.TimeStampCompose
 import kotlin.reflect.KFunction1
@@ -49,16 +74,13 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                     FiltersTool(viewModel)
                 }
                 TEXT_TOOL -> {
-                    TextTool(viewModel = viewModel)
+                    TextTools(viewModel)
                 }
                 ADJUST_TOOL -> {
                     AdjustColorTools(viewModel = viewModel)
                 }
                 MAIN_TOOL_TIMESTAMP->{
                     TimeStampCompose(viewModel)
-                }
-                9->{
-                    TextTools(viewModel)
                 }
             }
             Divider(

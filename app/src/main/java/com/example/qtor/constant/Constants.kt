@@ -80,8 +80,7 @@ val tools = listOf(
     Tool(R.drawable.ic_effects, R.string.tool_effects),
     Tool(R.drawable.ic_template, R.string.tool_stickers),
     Tool(R.drawable.ic_text, R.string.tool_text),
-    Tool(R.drawable.ic_timestamp, R.string.tool_timestamp),
-    Tool(R.drawable.ic_text, R.string.tool_text)
+    Tool(R.drawable.ic_timestamp, R.string.tool_timestamp)
 )
 val images = listOf(
     R.drawable.demo1,
