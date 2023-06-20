@@ -55,6 +55,8 @@ import com.example.qtor.constant.RECT_ITEM_EDIT_SIZE
 import com.example.qtor.constant.STORAGE_FONTS
 import com.example.qtor.constant.STORAGE_FRAMES
 import com.example.qtor.constant.STORAGE_STICKERS
+import com.example.qtor.constant.TEXT_ADD_EDITTEXT
+import com.example.qtor.constant.TEXT_ADD_TEXT
 import com.example.qtor.constant.TYPE_OTHERS
 import com.example.qtor.constant.TYPE_PEOPLE
 import com.example.qtor.constant.ZERO
@@ -64,6 +66,7 @@ import com.example.qtor.data.model.FilterObj
 import com.example.qtor.data.model.Font
 import com.example.qtor.data.model.ImageAction
 import com.example.qtor.data.model.Sticker
+import com.example.qtor.data.model.StickerText
 import com.example.qtor.data.model.StickerType
 import com.example.qtor.data.model.TimeStamp
 import com.example.qtor.data.repository.DataSource
@@ -385,16 +388,44 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             _timeStampInActive.update {
                 true
             }
-        }else{
+            _textInActive.update {
+                false
+            }
+        }
+        else if (_itemActive.value!= ITEM_ACTIVE_NULL && _stickers[itemActive.value].stickerType==StickerType.TEXT){
+            _textInActive.update {
+                true
+            }
+            _strTextActive.update {
+                if (_stickers[_itemActive.value] is StickerText){
+                    (_stickers[_itemActive.value] as StickerText).getText()
+                }else{
+                    ""
+                }
+            }
+            _timeStampInActive.update {
+                false
+            }
+        }
+        else{
+            _textInActive.update {
+                false
+            }
             _timeStampInActive.update {
                 false
             }
         }
     }
 
+    private val _strTextActive = MutableStateFlow("")
+    val strTextActive : StateFlow<String> = _strTextActive
     internal fun removeSticker() {
         _stickers.removeAt(_itemActive.value)
         setStickerActive(ITEM_ACTIVE_NULL)
+        _textInActive.update {
+            false
+        }
+
     }
 
     private val _mainToolActive = MutableStateFlow(-1)
@@ -486,7 +517,12 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
             PointF(rectActive.centerX(), rectActive.centerY())
         ).toFloat()
         val a = _stickers.toMutableList().apply {
-            set(_itemActive.value, this[_itemActive.value].copy(rect = rectActive, angle = angle))
+            this[_itemActive.value].apply {
+                rect = rectActive
+                this.scale=scaleF
+                this.angle=angle
+            }
+//            set(_itemActive.value, this[_itemActive.value].copy(rect = rectActive, angle = angle))
         }
         _stickers.clear()
         _stickers.addAll(a)
@@ -501,7 +537,11 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
         )
         matrixScale.mapRect(rectActive)
         val temp = _stickers.toMutableList().apply {
-            set(_itemActive.value, this[_itemActive.value].copy(rect = rectActive, angle = angle))
+            this[_itemActive.value].apply {
+                rect = rectActive
+                this.angle=angle
+            }
+//            set(_itemActive.value, this[_itemActive.value].copy(rect = rectActive, angle = angle))
         }
         _stickers.clear()
         _stickers.addAll(temp)
@@ -1153,4 +1193,84 @@ class EditorViewModel(private val application: Application) : BaseViewModel(appl
 
     private val _timeStampInActive = MutableStateFlow(false)
     val timeStampInActive : StateFlow<Boolean> = _timeStampInActive
+
+    private fun addStickerText(){
+        viewModelScope.launch(Dispatchers.IO) {
+            _stickers.add(StickerText(application, Typeface.MONOSPACE))
+            setStickerActive(_stickers.lastIndex)
+            updateStickerEx()
+        }
+    }
+    fun selectTextTool(index: Int){
+        when(index){
+            TEXT_ADD_TEXT->{addStickerText()}
+            TEXT_ADD_EDITTEXT->{_showKeyboard.update { true }}
+        }
+    }
+
+    private val _showKeyboard = MutableStateFlow(false)
+    val showKeyboard :StateFlow<Boolean> = _showKeyboard
+
+    fun updateStickerText(text:String){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+//                _strTextActive.update { it }
+                val sticker = this[_itemActive.value]
+                if (sticker is StickerText) {
+                    sticker.updateText(text)
+                    _stickers[itemActive.value] = sticker
+                    updateStickerEx()
+                }
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+
+    private val _textInActive = MutableStateFlow(false)
+    val textInActive : StateFlow<Boolean> = _textInActive
+
+    fun updateStickerText(font: Font){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is StickerText) {
+                    sticker.updateFont(font)
+                    _stickers[itemActive.value] = sticker
+                    updateStickerEx()
+                }
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+
+    fun updateAlphaText(alpha:Float){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is StickerText) {
+                    sticker.updateAlpha(alpha)
+                    _stickers[itemActive.value] = sticker
+                    updateStickerEx()
+                }
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
+    fun updateTextColor(color: Color){
+        viewModelScope.launch {
+            val a = _stickers.toMutableList().apply {
+                val sticker = this[_itemActive.value]
+                if (sticker is StickerText) {
+                    sticker.updateColor(color.toArgb())
+                    _stickers[itemActive.value] = sticker
+                    updateStickerEx()
+                }
+            }
+            _stickers.clear()
+            _stickers.addAll(a)
+        }
+    }
 }

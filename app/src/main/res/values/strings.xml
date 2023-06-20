@@ -11,6 +11,7 @@
     <string name="tool_effects">Effects</string>
     <string name="tool_stickers">Stickers</string>
     <string name="tool_text">Text</string>
+    <string name="tool_timestamp">TimeStamp</string>
     <string name="adjust_brightness">Brightness</string>
     <string name="adjust_brilliance">Brilliance</string>
     <string name="adjust_saturation">Saturation</string>
@@ -65,4 +66,12 @@
     <string name="filter_alpaca">Alpaca</string>
     <string name="filter_none">None</string>
     <string name="err_template">Error From Server With Message: </string>
+    <string name="opacity">Opacity</string>
+    <string name="text_placeholder">Please type here..</string>
+    <string name="current_time">Current Time</string>
+    <string name="taken_time">Taken Time</string>
+    <string name="set_date">Set Date</string>
+    <string name="set_time">Set Time</string>
+    <string name="pick">Pick</string>
+    <string name="set">Set</string>
 </resources>

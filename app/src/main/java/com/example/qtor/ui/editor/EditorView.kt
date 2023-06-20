@@ -227,7 +227,7 @@ fun EditorView(
             event.changes[0].position.y
         )
         when (mainToolActive) {
-            MAIN_TOOL_STICKERS -> {
+            MAIN_TOOL_STICKERS, MAIN_TOOL_TIMESTAMP, 9 -> {
                 downX = event.changes[0].position.x
                 downY = event.changes[0].position.y
                 if (itemActive != -1) {
@@ -328,7 +328,7 @@ fun EditorView(
                             processToolRemoveObj(event)
                         }
 
-                        MAIN_TOOL_STICKERS, MAIN_TOOL_FILTER, ADJUST_TOOL, MAIN_TOOL_TEXT, MAIN_TOOL_TIMESTAMP -> {
+                        MAIN_TOOL_STICKERS, MAIN_TOOL_FILTER, ADJUST_TOOL, MAIN_TOOL_TEXT, MAIN_TOOL_TIMESTAMP,9 -> {
                             processActionToolSticker(event)
                         }
 

@@ -8,20 +8,6 @@ import com.example.qtor.data.model.Tool
 
 const val IMAGE_TO_EDIT = "image_to_edit"
 const val TYPE_ALL_IMAGE = "image/*"
-val LIST_OF_TOOLS = mutableListOf(
-    "TEMPLATE",
-    "TOOLS",
-    "FRAME",
-    "FILTERS",
-    "ADJUST",
-    "EFFECTS",
-    "STICKERS",
-    "TEXT",
-    "TIMESTAMP",
-    "DRAW SHAPE",
-    "ADD PHOTOS",
-    "AI FILTER"
-)
 const val EDIT_IMAGE_TOOl = 1
 const val FRAME_TOOL = 2
 const val STICKER_TOOL = 6
@@ -55,7 +41,7 @@ const val LOADING = false
 const val INDILE = true
 const val STORAGE_FILTERS = "filters"
 const val STORAGE_FRAMES = "frames"
-const val STORAGE_FONTS = "fonts"
+const val STORAGE_FONTS = "text_fonts"
 const val ASSET_PATH = "file:///android_asset/"
 const val BASE_URL = "https://apis.clipdrop.co/"
 const val OLD_EXTENSION = "webp"
@@ -93,7 +79,9 @@ val tools = listOf(
     Tool(R.drawable.ic_adjust, R.string.tool_Adjust),
     Tool(R.drawable.ic_effects, R.string.tool_effects),
     Tool(R.drawable.ic_template, R.string.tool_stickers),
-    Tool(R.drawable.ic_remove_object, R.string.tool_text)
+    Tool(R.drawable.ic_text, R.string.tool_text),
+    Tool(R.drawable.ic_timestamp, R.string.tool_timestamp),
+    Tool(R.drawable.ic_text, R.string.tool_text)
 )
 val images = listOf(
     R.drawable.demo1,
@@ -225,3 +213,5 @@ const val CANNY_THRESHOLD_1 = 125.0
 const val CANNY_THRESHOLD_2 = 175.0
 const val PERCENT_INCREASE_HEIGHT_AI_PEOPLE = 20
 const val MAIN_TOOL_TIMESTAMP = 8
+const val TEXT_ADD_TEXT = 0
+const val TEXT_ADD_EDITTEXT = 1

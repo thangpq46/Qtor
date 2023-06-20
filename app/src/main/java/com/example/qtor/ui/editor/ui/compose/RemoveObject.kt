@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.example.qtor.constant.*
 import com.example.qtor.data.model.AITarget
 import com.example.qtor.data.model.BottomMenuItem
 import com.example.qtor.ui.editor.ui.compose.FrameTool
+import com.example.qtor.ui.editor.ui.compose.TextTools
 import com.example.qtor.ui.editor.ui.compose.TimeStampCompose
 import kotlin.reflect.KFunction1
 
@@ -55,6 +57,9 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
                 MAIN_TOOL_TIMESTAMP->{
                     TimeStampCompose(viewModel)
                 }
+                9->{
+                    TextTools(viewModel)
+                }
             }
             Divider(
                 color = androidx.compose.material3.MaterialTheme.colorScheme.outline,
@@ -63,10 +68,10 @@ fun BottomNavigationTool(viewModel: EditorViewModel) {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                itemsIndexed(items = LIST_OF_TOOLS) { index, tool ->
+                itemsIndexed(items = tools) { index, tool ->
                     MainTool(
                         index,
-                        tool,
+                        tool.toolNameID,
                         index == mainToolActive,
                         onClick = viewModel::setMainToolActive
                     )
@@ -133,14 +138,14 @@ fun RemoveObjectTool(modifier: Modifier = Modifier, viewModel: EditorViewModel) 
 }
 
 @Composable
-fun MainTool(index: Int, tool: String, isSelected: Boolean, onClick: KFunction1<Int, Unit>) {
+fun MainTool(index: Int, tool: Int, isSelected: Boolean, onClick: KFunction1<Int, Unit>) {
     Box(contentAlignment = Alignment.Center, modifier = Modifier
         .height(50.dp)
         .clickable {
             onClick(index)
         }) {
         Text(
-            text = tool,
+            text = stringResource(id = tool),
             modifier = Modifier
                 .wrapContentWidth(),
             fontWeight = FontWeight.SemiBold,
